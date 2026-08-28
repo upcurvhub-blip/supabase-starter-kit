@@ -84,9 +84,12 @@ export function ProductCardPrice({ product, showCta = true, size = "md" }: Props
           {mrp && discount > 0 && (
             <>
               <span className="text-xs text-muted-foreground line-through">₹{fmt(mrp)}</span>
-              <span className="text-[11px] font-semibold text-trust">{discount}% OFF</span>
+              <span className="badge-offer inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide">
+                {discount}% OFF
+              </span>
             </>
           )}
+
           <span className="text-xs font-normal text-muted-foreground">/{unit}</span>
         </div>
       ) : (
