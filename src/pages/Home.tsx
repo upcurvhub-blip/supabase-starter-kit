@@ -48,8 +48,6 @@ export default function Home() {
   const [sellerCities, setSellerCities] = useState<{ city: string; count: number }[]>([]);
   const [topSellers, setTopSellers] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [stats, setStats] = useState({ sellers: 0, products: 0, buyers: 0, categories: 0 });
-  const [statsLoaded, setStatsLoaded] = useState(false);
   const [cityImages, setCityImages] = useState<Record<string, string>>({});
 
 
@@ -129,21 +127,6 @@ export default function Home() {
       .order("trust_score", { ascending: false })
       .limit(6);
     setTopSellers(sellers || []);
-
-    // Fetch stats
-    const [{ count: sellerCount }, { count: productCount }, { count: buyerCount }, { count: catCount }] = await Promise.all([
-      supabase.from("seller_profiles").select("*", { count: "exact", head: true }).eq("status", "approved"),
-      supabase.from("products").select("*", { count: "exact", head: true }).eq("is_active", true),
-      supabase.from("requirements").select("*", { count: "exact", head: true }),
-      supabase.from("categories").select("*", { count: "exact", head: true }).eq("is_active", true),
-    ]);
-    setStats({
-      sellers: sellerCount || 0,
-      products: productCount || 0,
-      buyers: buyerCount || 0,
-      categories: catCount || 0,
-    });
-    setStatsLoaded(true);
 
     const { data: cityImgSetting } = await supabase
       .from("platform_settings").select("value").eq("key", "city_images").maybeSingle();
