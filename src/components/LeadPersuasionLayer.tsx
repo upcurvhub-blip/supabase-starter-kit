@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Zap, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { PERSUASION_COPY, responseSlotsLeft } from "@/lib/persuasionCopy";
+import { PERSUASION_COPY } from "@/lib/persuasionCopy";
 import { requestPopup, releasePopup, onIdle, exitIntentFired } from "@/lib/popupGate";
 
 interface Props {
@@ -21,7 +21,6 @@ const SESSION_KEY_PREFIX = "bt_persuasion_shown_";
  * All disappear the moment the visitor submits an enquiry.
  */
 export function LeadPersuasionLayer({ productId, avgResponseHours, submitted, onCta }: Props) {
-  const slots = useMemo(() => responseSlotsLeft(productId), [productId]);
   const [showSticky, setShowSticky] = useState(false);
   const [showNudge, setShowNudge] = useState(false);
   const sessionKey = `${SESSION_KEY_PREFIX}${productId}`;

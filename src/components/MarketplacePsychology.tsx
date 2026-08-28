@@ -1,7 +1,7 @@
 // Amazon-style marketplace psychology strip — live activity, competing quotes, scarcity.
 // Uses real counters where available, deterministic aggregates otherwise (no fake identities).
-import { Flame, Zap, TrendingUp, Clock, MessageSquare } from "lucide-react";
-import { responseSlotsLeft, endOfDayCountdown } from "@/lib/persuasionCopy";
+import { Flame, Zap, TrendingUp, MessageSquare } from "lucide-react";
+import { responseSlotsLeft } from "@/lib/persuasionCopy";
 
 interface Props {
   product: any;
@@ -23,14 +23,12 @@ export function MarketplacePsychology({ product, seller, enquiryCount = 0 }: Pro
   const quotedSuppliers = 3 + (seed % 5);
   const { left } = responseSlotsLeft(id);
   const replyMins = 8 + (seed % 22);
-  const countdown = endOfDayCountdown();
 
   const items = [
     { icon: MessageSquare, tone: "text-accent", label: `${quotedSuppliers} suppliers quoted this week` },
     { icon: Zap, tone: "text-success", label: `Replies in ~${replyMins} mins` },
     { icon: Flame, tone: "text-destructive", label: `Only ${left} quote slot${left > 1 ? "s" : ""} left today` },
     { icon: TrendingUp, tone: "text-primary", label: "Rising demand" },
-    { icon: Clock, tone: "text-accent", label: `Best price valid ${countdown}` },
   ];
 
   return (
