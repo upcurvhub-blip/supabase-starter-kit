@@ -98,11 +98,12 @@ export function ProductCommercials({ product, onBulkQuote }: Props) {
             {mrp && discount > 0 && (
               <>
                 <span className="text-lg text-muted-foreground line-through">₹{fmt(mrp)}</span>
-                <span className="rounded-full bg-trust/10 px-2 py-0.5 text-xs font-semibold text-trust">
+                <span className="badge-offer inline-flex items-center rounded-full px-2.5 py-1 text-xs font-bold uppercase tracking-wide">
                   {discount}% OFF
                 </span>
               </>
             )}
+
             <span className="text-muted-foreground">/ {unit}</span>
           </div>
 

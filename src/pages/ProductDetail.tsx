@@ -878,20 +878,21 @@ export default function ProductDetail() {
 
             <AiInsightCard product={product} seller={seller} />
 
-            {/* Tags — surfaced right under the AI insight as badges */}
+            {/* Also suitable for — checklist instead of hashtags */}
             {product.tags && product.tags.length > 0 && (
-              <div className="flex flex-wrap gap-2 -mt-2">
-                {product.tags.map((tag: string, i: number) => (
-                  <Badge
-                    key={i}
-                    variant="secondary"
-                    className="rounded-full px-3 py-1 text-xs font-medium max-w-full truncate"
-                  >
-                    #{tag}
-                  </Badge>
-                ))}
+              <div className="rounded-xl border bg-muted/30 p-4">
+                <h3 className="mb-2.5 text-sm font-semibold">Also suitable for</h3>
+                <ul className="grid gap-2 sm:grid-cols-2">
+                  {product.tags.map((tag: string, i: number) => (
+                    <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
+                      <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-trust" />
+                      <span className="min-w-0 break-words text-foreground">{tag}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
             )}
+
 
             {/* Description */}
             {product.description && (

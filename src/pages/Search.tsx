@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useSearchParams, useParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { MarketplaceLayout } from "@/components/layouts/MarketplaceLayout";
+import { ProductCardPrice } from "@/components/product/ProductCardPrice";
 import { ProductBadgeStack } from "@/components/ProductBadgeStack";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -455,25 +456,13 @@ export default function Search() {
                             {product.name}
                           </Link>
                           <div className="mt-1"><ProductBadgeStack product={product} seller={seller} max={3} /></div>
-                          {product.price_min && (
-                            <div className="mt-1 font-bold flex items-center">
-                              <IndianRupee className="h-3.5 w-3.5" />
-                              {product.price_min.toLocaleString()}
-                              {product.price_max ? ` - ${product.price_max.toLocaleString()}` : ""}
-                              <span className="text-muted-foreground font-normal text-xs ml-1">
-                                /{product.moq_unit || "unit"}
-                              </span>
-                            </div>
-                          )}
+                          <div className="mt-1"><ProductCardPrice product={product} showCta={false} size="sm" /></div>
                           <div className="mt-1 space-y-0.5">
                             {specs.map(([k, v]) => (
                               <div key={k} className="text-xs text-muted-foreground truncate">
                                 {k}: <span className="font-medium text-foreground">{String(v)}</span>
                               </div>
                             ))}
-                            <div className="text-xs text-muted-foreground truncate">
-                              MOQ: <span className="font-medium text-foreground">{product.min_order_quantity} {product.moq_unit}</span>
-                            </div>
                           </div>
                         </div>
                       </div>
@@ -565,18 +554,7 @@ export default function Search() {
                           <p className="text-sm text-muted-foreground line-clamp-2 mt-1">
                             {product.description}
                           </p>
-                          <div className="flex flex-wrap items-center gap-2 text-sm">
-                            {product.price_min && (
-                              <span className="font-medium flex items-center gap-1 text-primary">
-                                <IndianRupee className="h-3 w-3" />
-                                {product.price_min.toLocaleString()}
-                                {product.price_max && ` - ${product.price_max.toLocaleString()}`}
-                              </span>
-                            )}
-                            <span className="text-muted-foreground text-xs bg-muted px-2 py-1 rounded-full">
-                              MOQ: {product.min_order_quantity} {product.moq_unit}
-                            </span>
-                          </div>
+                          <ProductCardPrice product={product} showCta={false} />
                           {product.seller_profiles && (
                             <div className="flex flex-wrap items-center gap-2 pt-2 border-t">
                               <Link

@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useState } from "react";
-import { Clock, Zap, Sparkles } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Zap, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { PERSUASION_COPY, endOfDayCountdown, responseSlotsLeft } from "@/lib/persuasionCopy";
+import { PERSUASION_COPY } from "@/lib/persuasionCopy";
 import { requestPopup, releasePopup, onIdle, exitIntentFired } from "@/lib/popupGate";
 
 interface Props {
@@ -21,18 +21,10 @@ const SESSION_KEY_PREFIX = "bt_persuasion_shown_";
  * All disappear the moment the visitor submits an enquiry.
  */
 export function LeadPersuasionLayer({ productId, avgResponseHours, submitted, onCta }: Props) {
-  const slots = useMemo(() => responseSlotsLeft(productId), [productId]);
   const [showSticky, setShowSticky] = useState(false);
   const [showNudge, setShowNudge] = useState(false);
-  const [countdown, setCountdown] = useState(endOfDayCountdown());
   const sessionKey = `${SESSION_KEY_PREFIX}${productId}`;
 
-
-  // Refresh the countdown every minute
-  useEffect(() => {
-    const t = window.setInterval(() => setCountdown(endOfDayCountdown()), 60_000);
-    return () => window.clearInterval(t);
-  }, []);
 
   // Sticky pulse bar on scroll depth (persistent CTA button, not a popup —
   // intentionally not gated).
@@ -76,15 +68,8 @@ export function LeadPersuasionLayer({ productId, avgResponseHours, submitted, on
       {/* Time-based social-proof toast removed — one behaviour-driven popup only */}
 
 
-      {/* Price validity note — no fake scarcity */}
-      <div className="fixed right-3 top-24 z-40 hidden max-w-[220px] md:block">
-        <div className="rounded-xl border bg-card p-2.5 text-xs shadow-md">
-          <div className="mb-1 flex items-center gap-1.5 font-semibold text-foreground">
-            <Clock className="h-3.5 w-3.5" /> {PERSUASION_COPY.fastReply(avgResponseHours)}
-          </div>
-          <p className="text-muted-foreground">{PERSUASION_COPY.priceValid(countdown)}</p>
-        </div>
-      </div>
+
+
 
 
       {/* Sticky pulse CTA — desktop only (mobile already has its own sticky bar) */}
