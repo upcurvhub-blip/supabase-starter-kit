@@ -76,15 +76,8 @@ export function LeadPersuasionLayer({ productId, avgResponseHours, submitted, on
       {/* Time-based social-proof toast removed — one behaviour-driven popup only */}
 
 
-      {/* Price validity note — no fake scarcity */}
-      <div className="fixed right-3 top-24 z-40 hidden max-w-[220px] md:block">
-        <div className="rounded-xl border bg-card p-2.5 text-xs shadow-md">
-          <div className="mb-1 flex items-center gap-1.5 font-semibold text-foreground">
-            <Clock className="h-3.5 w-3.5" /> {PERSUASION_COPY.fastReply(avgResponseHours)}
-          </div>
-          <p className="text-muted-foreground">{PERSUASION_COPY.priceValid(countdown)}</p>
-        </div>
-      </div>
+
+
 
 
       {/* Sticky pulse CTA — desktop only (mobile already has its own sticky bar) */}
