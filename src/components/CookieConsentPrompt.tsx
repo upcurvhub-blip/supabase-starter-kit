@@ -20,7 +20,7 @@ export function CookieConsentPrompt() {
   };
 
   return (
-    <div className="fixed left-1/2 top-1/2 z-[60] w-[calc(100%-1.5rem)] max-w-lg -translate-x-1/2 -translate-y-1/2 rounded-2xl border bg-card p-4 shadow-2xl animate-in fade-in zoom-in-95 duration-300 ease-out">
+    <div className="fixed bottom-3 left-1/2 z-[60] w-[calc(100%-1.5rem)] max-w-lg -translate-x-1/2 rounded-2xl border bg-card p-4 shadow-2xl animate-in fade-in slide-in-from-bottom-4 duration-300 ease-out md:bottom-5 md:max-w-2xl">
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div className="flex gap-3">
           <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-accent/10 text-accent">
