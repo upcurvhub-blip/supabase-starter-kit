@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
-import { Clock, Zap, Sparkles } from "lucide-react";
+import { Zap, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { PERSUASION_COPY, endOfDayCountdown, responseSlotsLeft } from "@/lib/persuasionCopy";
+import { PERSUASION_COPY, responseSlotsLeft } from "@/lib/persuasionCopy";
 import { requestPopup, releasePopup, onIdle, exitIntentFired } from "@/lib/popupGate";
 
 interface Props {
@@ -24,15 +24,8 @@ export function LeadPersuasionLayer({ productId, avgResponseHours, submitted, on
   const slots = useMemo(() => responseSlotsLeft(productId), [productId]);
   const [showSticky, setShowSticky] = useState(false);
   const [showNudge, setShowNudge] = useState(false);
-  const [countdown, setCountdown] = useState(endOfDayCountdown());
   const sessionKey = `${SESSION_KEY_PREFIX}${productId}`;
 
-
-  // Refresh the countdown every minute
-  useEffect(() => {
-    const t = window.setInterval(() => setCountdown(endOfDayCountdown()), 60_000);
-    return () => window.clearInterval(t);
-  }, []);
 
   // Sticky pulse bar on scroll depth (persistent CTA button, not a popup —
   // intentionally not gated).
