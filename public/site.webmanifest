@@ -1,0 +1,13 @@
+{
+    "name": "Upcurv Trade",
+    "short_name": "Upcurv Trade",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#2563EB",
+    "icons": [{
+        "src": "/favicon-32.png",
+        "sizes": "32x32",
+        "type": "image/png"
+    }]
+}

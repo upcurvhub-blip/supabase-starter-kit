@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <sitemap><loc>https://wjtxyoaqtxsfbtrzsimb.supabase.co/functions/v1/sitemap-xml?s=static</loc></sitemap>
+  <sitemap><loc>https://wjtxyoaqtxsfbtrzsimb.supabase.co/functions/v1/sitemap-xml?s=categories</loc></sitemap>
+  <sitemap><loc>https://wjtxyoaqtxsfbtrzsimb.supabase.co/functions/v1/sitemap-xml?s=sellers</loc></sitemap>
+  <sitemap><loc>https://wjtxyoaqtxsfbtrzsimb.supabase.co/functions/v1/sitemap-xml?s=products</loc></sitemap>
+  <sitemap><loc>https://wjtxyoaqtxsfbtrzsimb.supabase.co/functions/v1/sitemap-xml?s=local</loc></sitemap>
+  <sitemap><loc>https://wjtxyoaqtxsfbtrzsimb.supabase.co/functions/v1/sitemap-xml?s=citycategory</loc></sitemap>
+  <sitemap><loc>https://wjtxyoaqtxsfbtrzsimb.supabase.co/functions/v1/sitemap-xml?s=brands</loc></sitemap>
+  <sitemap><loc>https://wjtxyoaqtxsfbtrzsimb.supabase.co/functions/v1/sitemap-xml?s=cities</loc></sitemap>
+  <sitemap><loc>https://wjtxyoaqtxsfbtrzsimb.supabase.co/functions/v1/sitemap-xml?s=roles</loc></sitemap>
+  <sitemap><loc>https://wjtxyoaqtxsfbtrzsimb.supabase.co/functions/v1/sitemap-xml?s=guides</loc></sitemap>
+</sitemapindex>

@@ -1,0 +1,20 @@
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Twitterbot
+Allow: /
+
+User-agent: facebookexternalhit
+Allow: /
+
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /seller/
+Disallow: /search?q=
+Disallow: /*?q=
+
+Sitemap: https://wjtxyoaqtxsfbtrzsimb.supabase.co/functions/v1/sitemap-xml

@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="/rss.xsl"?>
+<!-- This static file is a proxy hint. The real RSS is served by the Supabase edge function. -->
+<rss version="2.0"><channel><title>Redirect</title><link>https://wjtxyoaqtxsfbtrzsimb.supabase.co/functions/v1/rss-products</link><description>See real feed at the link above.</description></channel></rss>
