@@ -2,7 +2,9 @@ import { AdSlot } from "@/components/AdSlot";
 import { Link, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Helmet } from "react-helmet-async";
+import { useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useCityPreference, sortByCityPriority } from "@/hooks/useCityPreference";
 import { MarketplaceLayout } from "@/components/layouts/MarketplaceLayout";
 import { ProductBadgeStack } from "@/components/ProductBadgeStack";
 import { Card, CardContent } from "@/components/ui/card";
@@ -54,7 +56,13 @@ export default function CategoryPage() {
   const category = data?.category ?? null;
   const parent = data?.parent ?? null;
   const subs = data?.subs ?? [];
-  const products = data?.products ?? [];
+  const { city: prefCity } = useCityPreference();
+  const rawProducts = data?.products ?? [];
+  // Same-city sellers first when the visitor shared their location.
+  const products = useMemo(
+    () => sortByCityPriority(rawProducts, prefCity, (p: any) => p.seller_profiles?.city),
+    [rawProducts, prefCity],
+  );
   const loading = isLoading && !data;
 
 
