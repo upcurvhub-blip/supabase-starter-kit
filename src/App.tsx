@@ -19,6 +19,8 @@ import { ExitIntentDialog } from "./components/ExitIntentDialog";
 import { CookieConsentPrompt } from "./components/CookieConsentPrompt";
 import { ShoppingIntentProvider } from "./hooks/useShoppingIntent";
 import { ShoppingIntentDialog } from "./components/intent/ShoppingIntentDialog";
+import { CityPreferenceProvider } from "./hooks/useCityPreference";
+import { LocationCapturePrompt } from "./components/LocationCapturePrompt";
 import { FloatingActions } from "./components/FloatingActions";
 
 
@@ -110,11 +112,13 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <ShoppingIntentProvider>
+        <CityPreferenceProvider>
         <ScrollToTop />
         <RedirectHandler />
         <ExitIntentDialog />
         <CookieConsentPrompt />
         <ShoppingIntentDialog />
+        <LocationCapturePrompt />
         <FloatingActions />
         <Suspense fallback={<PageSkeleton />}>
         <RouteTransition>
@@ -199,6 +203,7 @@ const App = () => (
         </Routes>
         </RouteTransition>
         </Suspense>
+        </CityPreferenceProvider>
         </ShoppingIntentProvider>
       </BrowserRouter>
     </TooltipProvider>
