@@ -2,7 +2,8 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import DashboardLayout from "@/components/layouts/DashboardLayout";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertCircle, Sparkles } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { AlertCircle, Sparkles, Wrench, Eye, CheckCircle2 } from "lucide-react";
 import { SellerMetricsCards } from "@/components/dashboard/SellerMetricsCards";
 import AiConsultantPanel from "@/components/dashboard/AiConsultantPanel";
 
@@ -58,6 +59,20 @@ const SellerDashboard = () => {
     enabled: !!sellerProfile,
   });
 
+  const { data: services } = useQuery({
+    queryKey: ["seller-services-dashboard"],
+    queryFn: async () => {
+      if (!sellerProfile) return [];
+      const { data } = await supabase
+        .from("services")
+        .select("id, title, is_active, view_count")
+        .eq("seller_id", sellerProfile.id)
+        .order("view_count", { ascending: false });
+      return data || [];
+    },
+    enabled: !!sellerProfile,
+  });
+
   const { data: productViews } = useQuery({
     queryKey: ["seller-product-views"],
     queryFn: async () => {
@@ -74,6 +89,11 @@ const SellerDashboard = () => {
 
   const isPending = sellerProfile?.status === "pending";
   const isRejected = sellerProfile?.status === "rejected";
+
+  // Service metrics
+  const totalServices = services?.length || 0;
+  const activeServices = services?.filter((s) => s.is_active).length || 0;
+  const serviceViews = services?.reduce((sum, s) => sum + (s.view_count || 0), 0) || 0;
 
   // Calculate metrics
   const totalProducts = products?.length || 0;
@@ -206,6 +226,25 @@ const SellerDashboard = () => {
           viewsChange={viewsChange}
           conversionChange={conversionChange}
         />
+        </div>
+
+        {/* Services KPIs */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {[
+            { label: "Services Listed", value: totalServices, Icon: Wrench },
+            { label: "Active Services", value: activeServices, Icon: CheckCircle2 },
+            { label: "Service Views", value: serviceViews, Icon: Eye },
+          ].map(({ label, value, Icon }) => (
+            <Card key={label}>
+              <CardContent className="flex items-center justify-between p-4">
+                <div>
+                  <p className="text-xs text-muted-foreground">{label}</p>
+                  <p className="text-2xl font-bold">{value.toLocaleString()}</p>
+                </div>
+                <Icon className="h-5 w-5 text-muted-foreground" />
+              </CardContent>
+            </Card>
+          ))}
         </div>
 
         {/* Proactive AI consultant */}

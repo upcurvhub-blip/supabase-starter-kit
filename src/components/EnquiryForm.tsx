@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { ensureDeviceId } from "@/hooks/useDeviceId";
+import { saveVisitorIdentity } from "@/lib/visitorIdentity";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -87,6 +88,13 @@ export function EnquiryForm({ product, trigger, onSuccess }: EnquiryFormProps) {
       });
       // Note: anonymous users cannot read leads back (RLS), so we don't chain .select()
       if (error) throw error;
+
+      // Cache identity locally too — anon visitors cannot read visitor_devices back.
+      saveVisitorIdentity({
+        name: form.name.trim(),
+        phone: form.phone.trim(),
+        city: form.city.trim(),
+      });
 
       // Persist visitor identity so future visits can auto-match this device.
       if (deviceId) {

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import DashboardLayout from "@/components/layouts/DashboardLayout";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   MetricCard, 
@@ -53,6 +53,20 @@ const SellerAnalytics = () => {
       const { data } = await supabase
         .from("products")
         .select("*, categories(id, name)")
+        .eq("seller_id", sellerProfile.id)
+        .order("view_count", { ascending: false });
+      return data || [];
+    },
+    enabled: !!sellerProfile,
+  });
+
+  const { data: services = [] } = useQuery({
+    queryKey: ["seller-services-analytics", sellerProfile?.id],
+    queryFn: async () => {
+      if (!sellerProfile) return [];
+      const { data } = await supabase
+        .from("services")
+        .select("id, title, city, price, unit, is_active, view_count, categories:category_id(name)")
         .eq("seller_id", sellerProfile.id)
         .order("view_count", { ascending: false });
       return data || [];
@@ -421,9 +435,10 @@ const SellerAnalytics = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full max-w-2xl grid-cols-4">
+          <TabsList className="grid w-full max-w-3xl grid-cols-5">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="products">Products</TabsTrigger>
+            <TabsTrigger value="services">Services</TabsTrigger>
             <TabsTrigger value="visitors">Visitors</TabsTrigger>
             <TabsTrigger value="cta">CTA Clicks</TabsTrigger>
           </TabsList>
@@ -666,6 +681,44 @@ const SellerAnalytics = () => {
                 emptyMessage="No product demand data yet."
               />
             </div>
+          </TabsContent>
+
+          <TabsContent value="services" className="mt-6 space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Service Performance</CardTitle>
+                <CardDescription>
+                  {services.length} services ·{" "}
+                  {services.reduce((sum: number, s: any) => sum + (s.view_count || 0), 0).toLocaleString()} total views
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {services.length === 0 ? (
+                  <p className="py-8 text-center text-muted-foreground">
+                    No services published yet. Add services to start tracking their views.
+                  </p>
+                ) : (
+                  <div className="space-y-3">
+                    {services.map((s: any) => (
+                      <div key={s.id} className="flex items-center justify-between gap-3 rounded-lg border p-3">
+                        <div className="min-w-0">
+                          <p className="truncate font-medium">{s.title}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {s.categories?.name || "Uncategorised"}
+                            {s.city ? ` · ${s.city}` : ""}
+                            {s.is_active ? "" : " · inactive"}
+                          </p>
+                        </div>
+                        <div className="text-right shrink-0">
+                          <p className="font-semibold">{(s.view_count || 0).toLocaleString()}</p>
+                          <p className="text-xs text-muted-foreground">views</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </TabsContent>
 
           <TabsContent value="visitors" className="mt-6 space-y-6">

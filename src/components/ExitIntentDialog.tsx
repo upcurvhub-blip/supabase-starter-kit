@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { saveVisitorIdentity } from "@/lib/visitorIdentity";
 import { ensureDeviceId } from "@/hooks/useDeviceId";
 import { Sparkles } from "lucide-react";
 import { requestPopup, releasePopup, onExitIntent, markExitIntentFired } from "@/lib/popupGate";
@@ -57,6 +58,8 @@ export function ExitIntentDialog() {
     setSubmitting(true);
     try {
       const deviceId = ensureDeviceId();
+
+      saveVisitorIdentity({ name: form.name.trim(), phone: form.phone.trim() });
 
       // Upsert visitor identity
       if (deviceId) {

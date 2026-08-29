@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -45,6 +45,14 @@ export default function ServiceDetail() {
     },
     enabled: !!service?.seller_id,
   });
+
+  // Count a view once per mounted service so sellers see service view stats.
+  const trackedServiceId = useRef<string | null>(null);
+  useEffect(() => {
+    if (!service?.id || trackedServiceId.current === service.id) return;
+    trackedServiceId.current = service.id;
+    void supabase.rpc("record_service_view", { p_service_id: service.id });
+  }, [service?.id]);
 
   const { data: moreServices } = useQuery({
     queryKey: ["more-services", service?.category_id, service?.id],
