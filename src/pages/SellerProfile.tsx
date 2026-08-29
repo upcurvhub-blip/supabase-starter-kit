@@ -33,6 +33,11 @@ import {
   Heart,
   Share2,
   MessageSquare,
+  Instagram,
+  Facebook,
+  Linkedin,
+  Twitter,
+  Youtube,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { ShareDialog } from "@/components/ShareDialog";
@@ -790,6 +795,38 @@ export default function SellerProfile() {
                       </p>
                     </div>
                   </div>
+
+                  {(() => {
+                    const links = ((seller as any)?.social_links || {}) as Record<string, string>;
+                    const items = [
+                      { key: "instagram", label: "Instagram", Icon: Instagram },
+                      { key: "facebook", label: "Facebook", Icon: Facebook },
+                      { key: "linkedin", label: "LinkedIn", Icon: Linkedin },
+                      { key: "twitter", label: "Twitter", Icon: Twitter },
+                      { key: "youtube", label: "YouTube", Icon: Youtube },
+                    ].filter((i) => !!links[i.key]);
+                    if (!items.length) return null;
+                    return (
+                      <div>
+                        <p className="font-medium mb-2">Follow us</p>
+                        <div className="flex flex-wrap gap-2">
+                          {items.map(({ key, label, Icon }) => (
+                            <a
+                              key={key}
+                              href={links[key]}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              aria-label={label}
+                              title={label}
+                              className="inline-flex h-9 w-9 items-center justify-center rounded-full border text-muted-foreground transition-colors hover:border-primary hover:text-primary"
+                            >
+                              <Icon className="h-4 w-4" />
+                            </a>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })()}
 
                   {seller.website && (
                     <div className="flex items-center gap-3">
