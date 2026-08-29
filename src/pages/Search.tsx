@@ -2,6 +2,7 @@ import { AdSlot } from "@/components/AdSlot";
 import { useState, useEffect } from "react";
 import { useSearchParams, useParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { useCityPreference, sortByCityPriority } from "@/hooks/useCityPreference";
 import { MarketplaceLayout } from "@/components/layouts/MarketplaceLayout";
 import { ProductCardPrice } from "@/components/product/ProductCardPrice";
 import { ProductBadgeStack } from "@/components/ProductBadgeStack";
@@ -28,6 +29,7 @@ export default function Search() {
   const { trackSearch } = useIntentTracking();
   
   const [products, setProducts] = useState<any[]>([]);
+  const { city: prefCity } = useCityPreference();
   const [categories, setCategories] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
@@ -180,6 +182,12 @@ export default function Search() {
     setLocations(uniqueLocations as string[]);
     setLoading(false);
   };
+
+  // Same-city sellers first when the visitor shared their location.
+  const visibleProducts = useMemo(
+    () => sortByCityPriority(products, prefCity, (p: any) => p.seller_profiles?.city),
+    [products, prefCity],
+  );
 
   const currentCategory = categories.find((c) => c.id === selectedCategory);
   const topLevelCategories = categories
@@ -378,7 +386,7 @@ export default function Search() {
                 <h1 className="text-2xl font-bold">
                   {currentCategory ? currentCategory.name : query ? `Results for "${query}"` : "All Products"}
                 </h1>
-                <p className="text-muted-foreground text-sm">{products.length} products found</p>
+                <p className="text-muted-foreground text-sm">{visibleProducts.length} products found</p>
               </div>
               <Select value={sortBy} onValueChange={setSortBy}>
                 <SelectTrigger className="w-48">
@@ -410,7 +418,7 @@ export default function Search() {
                   </Card>
                 ))}
               </div>
-            ) : products.length === 0 ? (
+            ) : visibleProducts.length === 0 ? (
               <Card>
                 <CardContent className="p-12 text-center">
                   <Package className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
@@ -427,7 +435,7 @@ export default function Search() {
               <>
               {/* Mobile: IndiaMart-style list layout */}
               <div className="md:hidden divide-y rounded-lg border bg-card">
-                {products.map((product) => {
+                {visibleProducts.map((product) => {
                   const seller = product.seller_profiles;
                   const specs = (product.specifications && typeof product.specifications === "object")
                     ? Object.entries(product.specifications as Record<string, any>).filter(([, v]) => v).slice(0, 4)
@@ -528,7 +536,7 @@ export default function Search() {
 
               {/* Desktop grid */}
               <div className="hidden md:grid grid-cols-2 xl:grid-cols-3 gap-4">
-                {products.map((product) => (
+                {visibleProducts.map((product) => (
                   <Card key={product.id} className="hover:shadow-lg transition-all overflow-hidden border-2 hover:border-primary/20">
                     <CardContent className="p-0">
                       <Link to={`/product/${product.slug || product.id}`}>
