@@ -74,7 +74,7 @@ export function ShoppingIntentDialog() {
 
   useEffect(() => {
     if (!open) return;
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && dismiss();
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [open]);
@@ -112,7 +112,7 @@ export function ShoppingIntentDialog() {
 
   return (
     <div className="fixed inset-0 z-[201] flex items-center justify-center p-4 animate-fade-in">
-      <div className="absolute inset-0 bg-foreground/50 backdrop-blur-sm" onClick={() => setOpen(false)} />
+      <div className="absolute inset-0 bg-foreground/50 backdrop-blur-sm" onClick={dismiss} />
       <div
         role="dialog"
         aria-modal="true"
@@ -121,7 +121,7 @@ export function ShoppingIntentDialog() {
       >
         <button
           type="button"
-          onClick={() => setOpen(false)}
+          onClick={dismiss}
           aria-label="Close"
           className="absolute right-3 top-3 rounded-full p-1 text-muted-foreground hover:bg-muted"
         >
