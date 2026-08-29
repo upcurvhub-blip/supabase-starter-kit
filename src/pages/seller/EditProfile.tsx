@@ -521,6 +521,11 @@ const EditProfile = () => {
                       onChange={(e) => setFormData({ ...formData, social_links: { ...formData.social_links, twitter: e.target.value } })}
                       placeholder="Twitter URL"
                     />
+                    <Input
+                      value={formData.social_links.youtube || ""}
+                      onChange={(e) => setFormData({ ...formData, social_links: { ...formData.social_links, youtube: e.target.value } })}
+                      placeholder="YouTube channel URL"
+                    />
                   </div>
                 </div>
               </TabsContent>
