@@ -555,6 +555,12 @@ export default function SellerProfile() {
             >
               Products ({products?.length || 0})
             </TabsTrigger>
+            <TabsTrigger
+              value="services"
+              className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-6 py-3"
+            >
+              Services ({services?.length || 0})
+            </TabsTrigger>
             <TabsTrigger 
               value="about" 
               className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-6 py-3"
