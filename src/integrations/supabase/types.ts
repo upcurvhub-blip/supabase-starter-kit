@@ -2943,6 +2943,10 @@ export type Database = {
         }
         Returns: string
       }
+      record_service_view: {
+        Args: { p_service_id: string }
+        Returns: undefined
+      }
       record_visitor_page_view: {
         Args: {
           p_category_id?: string
