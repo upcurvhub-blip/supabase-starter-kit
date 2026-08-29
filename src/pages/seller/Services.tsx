@@ -15,7 +15,7 @@ import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import {
-  Plus, Edit, Trash2, Wrench, Clock, MapPin, Shield, ArrowLeft, ArrowRight, Check,
+  Plus, Edit, Trash2, Wrench, Clock, MapPin, Shield, ArrowLeft, ArrowRight, Check, LayoutGrid, List, Eye,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { ImageUpload } from "@/components/ImageUpload";
@@ -49,6 +49,7 @@ export default function SellerServices() {
   const [editing, setEditing] = useState<any>(null);
   const [step, setStep] = useState(0);
   const [form, setForm] = useState({ ...emptyForm });
+  const [view, setView] = useState<"grid" | "list">("grid");
 
   const { data: sellerProfile } = useQuery({
     queryKey: ["my-seller-profile"],
@@ -96,6 +97,8 @@ export default function SellerServices() {
       return data || [];
     },
   });
+
+  const totalServiceViews = (services || []).reduce((sum: number, s: any) => sum + (s.view_count || 0), 0);
 
   const reset = () => { setForm({ ...emptyForm }); setEditing(null); setStep(0); };
 
@@ -574,6 +577,7 @@ export default function SellerServices() {
                         <TableHead>Category</TableHead>
                         <TableHead>Price</TableHead>
                         <TableHead>City</TableHead>
+                        <TableHead>Views</TableHead>
                         <TableHead>Active</TableHead>
                         <TableHead>Actions</TableHead>
                       </TableRow>
@@ -593,6 +597,7 @@ export default function SellerServices() {
                           <TableCell>{s.category?.name || "—"}</TableCell>
                           <TableCell>{s.price ? `₹${s.price} ${s.unit?.replace("_", " ")}` : "Quote"}</TableCell>
                           <TableCell><span className="inline-flex items-center gap-1"><MapPin className="h-3 w-3" />{s.city || "—"}</span></TableCell>
+                          <TableCell><span className="inline-flex items-center gap-1"><Eye className="h-3 w-3" />{s.view_count || 0}</span></TableCell>
                           <TableCell>
                             <Switch checked={s.is_active} onCheckedChange={(v) => toggleActive.mutate({ id: s.id, is_active: v })} />
                           </TableCell>
