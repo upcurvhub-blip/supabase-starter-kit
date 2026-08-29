@@ -113,6 +113,23 @@ export default function SellerProfile() {
     enabled: !!sellerId,
   });
 
+  // Fetch seller services
+  const { data: services } = useQuery({
+    queryKey: ["seller-services-public", sellerId],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("services")
+        .select("*, categories:category_id(name)")
+        .eq("seller_id", sellerId)
+        .eq("is_active", true)
+        .order("created_at", { ascending: false });
+      return data || [];
+    },
+    enabled: !!sellerId,
+  });
+
+
+
   // Fetch reviews
   const { data: reviews } = useQuery({
     queryKey: ["seller-reviews", sellerId],
