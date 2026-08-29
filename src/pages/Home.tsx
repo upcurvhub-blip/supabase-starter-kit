@@ -49,11 +49,45 @@ export default function Home() {
   const [topSellers, setTopSellers] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [cityImages, setCityImages] = useState<Record<string, string>>({});
+  const [categoryDemand, setCategoryDemand] = useState<Record<string, number>>({});
 
 
   useEffect(() => {
     fetchData();
   }, []);
+
+  /**
+   * Trending top-level categories: ranked by real demand (listings, views and
+   * enquiries rolled up from the category and all of its subcategories).
+   * Falls back to display order when there is no activity yet.
+   */
+  const trendingCategories = useMemo(() => {
+    const roots = categories.filter((c) => c.level === 1);
+    const rootOf = new Map<string, string>();
+    const resolve = (id: string, depth = 0): string | null => {
+      if (depth > 6) return null;
+      const cat = categories.find((c) => c.id === id);
+      if (!cat) return null;
+      if (!cat.parent_id) return cat.id;
+      return resolve(cat.parent_id, depth + 1);
+    };
+    categories.forEach((c) => {
+      const root = resolve(c.id);
+      if (root) rootOf.set(c.id, root);
+    });
+
+    const score: Record<string, number> = {};
+    Object.entries(categoryDemand).forEach(([catId, value]) => {
+      const root = rootOf.get(catId);
+      if (root) score[root] = (score[root] || 0) + value;
+    });
+
+    return [...roots].sort(
+      (a, b) =>
+        (score[b.id] || 0) - (score[a.id] || 0) ||
+        (a.display_order ?? 999) - (b.display_order ?? 999),
+    );
+  }, [categories, categoryDemand]);
 
   const fetchData = async () => {
     // Fetch all active categories (parents + subs)
@@ -63,6 +97,20 @@ export default function Home() {
       .eq("is_active", true)
       .order("display_order");
     setCategories(cats || []);
+
+    // Demand signal per category (listings + views) to surface trending ones
+    const { data: demandRows } = await supabase
+      .from("products")
+      .select("category_id, view_count, enquiry_count")
+      .eq("is_active", true)
+      .limit(1000);
+    const demand: Record<string, number> = {};
+    for (const row of demandRows || []) {
+      if (!row.category_id) continue;
+      demand[row.category_id] =
+        (demand[row.category_id] || 0) + 5 + (row.view_count || 0) + (row.enquiry_count || 0) * 10;
+    }
+    setCategoryDemand(demand);
 
     // Fetch featured products
     const { data: products } = await supabase
@@ -225,10 +273,10 @@ export default function Home() {
             <aside className="hidden lg:block">
               <div className="rounded-xl border bg-card overflow-hidden">
                 <div className="px-4 py-3 border-b bg-primary text-primary-foreground text-sm font-semibold flex items-center gap-2">
-                  <Package className="h-4 w-4" /> All Categories
+                  <Package className="h-4 w-4" /> Trending Categories
                 </div>
                 <ul className="max-h-[420px] overflow-y-auto">
-                  {categories.filter((c) => c.level === 1).slice(0, 14).map((c) => (
+                  {trendingCategories.slice(0, 14).map((c) => (
                     <li key={c.id}>
                       <Link to={`/category/${c.slug}`} className="flex items-center justify-between px-4 py-2.5 text-sm hover:bg-primary/5 hover:text-primary transition-colors">
                         <span className="truncate">{c.name}</span>
@@ -355,8 +403,8 @@ export default function Home() {
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-end mb-6">
             <div>
-              <h2 className="text-2xl md:text-3xl font-bold mb-1">Explore Products by Category</h2>
-              <p className="text-sm text-muted-foreground">Tap a category to explore subcategories & products</p>
+              <h2 className="text-2xl md:text-3xl font-bold mb-1">Trending Categories</h2>
+              <p className="text-sm text-muted-foreground">Most viewed and most enquired categories right now</p>
             </div>
             <Button variant="outline" asChild className="hidden md:flex">
               <Link to="/categories" className="gap-2">View All <ArrowRight className="h-4 w-4" /></Link>
@@ -364,11 +412,7 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3 md:gap-4">
-            {categories
-              .filter((c) => c.level === 1)
-              .sort((a, b) => (a.display_order ?? 999) - (b.display_order ?? 999))
-              .slice(0, 16)
-              .map((cat) => (
+            {trendingCategories.slice(0, 16).map((cat) => (
                 <Link key={cat.id} to={`/category/${cat.slug}`} className="group text-center">
                   <div className="aspect-square rounded-xl overflow-hidden border-2 bg-card group-hover:border-primary/40 group-hover:shadow-md transition-all flex items-center justify-center">
                     {cat.image_url ? (
