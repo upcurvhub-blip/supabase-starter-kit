@@ -1,5 +1,5 @@
 import { AdSlot } from "@/components/AdSlot";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useSearchParams, useParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useCityPreference, sortByCityPriority } from "@/hooks/useCityPreference";
