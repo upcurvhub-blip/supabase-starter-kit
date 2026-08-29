@@ -144,27 +144,29 @@ export function DashboardLayout({ children, role, title }: DashboardLayoutProps)
             </Link>
           </div>
 
-          <TopbarTools guideHref={role === "seller" ? "/seller/guide" : "/admin/seo-guide"} />
+          <div className="flex items-center gap-2 ml-auto">
+            <TopbarTools guideHref={role === "seller" ? "/seller/guide" : "/admin/seo-guide"} />
 
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="gap-2">
-                <UserIcon className="h-4 w-4" />
-                <span className="hidden sm:inline">{profile?.full_name || "Account"}</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <div className="px-2 py-1.5">
-                <p className="text-sm font-medium">{profile?.full_name}</p>
-                <p className="text-xs text-muted-foreground">{profile?.email}</p>
-              </div>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleSignOut} className="text-destructive">
-                <LogOut className="h-4 w-4 mr-2" />
-                Sign Out
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="gap-2">
+                  <UserIcon className="h-4 w-4" />
+                  <span className="hidden sm:inline">{profile?.full_name || "Account"}</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <div className="px-2 py-1.5">
+                  <p className="text-sm font-medium">{profile?.full_name}</p>
+                  <p className="text-xs text-muted-foreground">{profile?.email}</p>
+                </div>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleSignOut} className="text-destructive">
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Sign Out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
       </header>
 

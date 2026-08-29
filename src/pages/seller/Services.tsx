@@ -15,7 +15,7 @@ import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import {
-  Plus, Edit, Trash2, Wrench, Clock, MapPin, Shield, ArrowLeft, ArrowRight, Check,
+  Plus, Edit, Trash2, Wrench, Clock, MapPin, Shield, ArrowLeft, ArrowRight, Check, LayoutGrid, List, Eye,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { ImageUpload } from "@/components/ImageUpload";
@@ -49,6 +49,7 @@ export default function SellerServices() {
   const [editing, setEditing] = useState<any>(null);
   const [step, setStep] = useState(0);
   const [form, setForm] = useState({ ...emptyForm });
+  const [view, setView] = useState<"grid" | "list">("grid");
 
   const { data: sellerProfile } = useQuery({
     queryKey: ["my-seller-profile"],
@@ -96,6 +97,8 @@ export default function SellerServices() {
       return data || [];
     },
   });
+
+  const totalServiceViews = (services || []).reduce((sum: number, s: any) => sum + (s.view_count || 0), 0);
 
   const reset = () => { setForm({ ...emptyForm }); setEditing(null); setStep(0); };
 
@@ -498,9 +501,21 @@ export default function SellerServices() {
         </div>
 
         <Card>
-          <CardHeader>
-            <CardTitle>Your Services</CardTitle>
-            <CardDescription>{services?.length || 0} total</CardDescription>
+          <CardHeader className="flex flex-row items-start justify-between gap-3">
+            <div>
+              <CardTitle>Your Services</CardTitle>
+              <CardDescription>
+                {services?.length || 0} total · {totalServiceViews.toLocaleString()} views
+              </CardDescription>
+            </div>
+            <div className="flex gap-1">
+              <Button size="icon" variant={view === "grid" ? "default" : "outline"} aria-label="Grid view" onClick={() => setView("grid")}>
+                <LayoutGrid className="h-4 w-4" />
+              </Button>
+              <Button size="icon" variant={view === "list" ? "default" : "outline"} aria-label="List view" onClick={() => setView("list")}>
+                <List className="h-4 w-4" />
+              </Button>
+            </div>
           </CardHeader>
           <CardContent>
             {isLoading ? <div className="py-8 text-center text-muted-foreground">Loading…</div> :
@@ -508,6 +523,50 @@ export default function SellerServices() {
                 <div className="py-12 text-center text-muted-foreground">
                   <Wrench className="h-12 w-12 mx-auto mb-3 opacity-40" />
                   <p>No services yet. Add your first service to start receiving enquiries.</p>
+                </div>
+              ) : view === "grid" ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+                  {services.map((s: any) => (
+                    <Card key={s.id} className="overflow-hidden">
+                      <div className="aspect-video bg-muted overflow-hidden">
+                        {s.images?.length ? (
+                          <img src={s.images[0]} alt={s.title} className="h-full w-full object-cover" />
+                        ) : (
+                          <div className="flex h-full w-full items-center justify-center">
+                            <Wrench className="h-10 w-10 text-muted-foreground/30" />
+                          </div>
+                        )}
+                      </div>
+                      <CardContent className="p-4 space-y-2">
+                        <div className="flex items-start justify-between gap-2">
+                          <p className="font-medium leading-tight line-clamp-2">{s.title}</p>
+                          <Switch checked={s.is_active} onCheckedChange={(v) => toggleActive.mutate({ id: s.id, is_active: v })} />
+                        </div>
+                        <p className="text-xs text-muted-foreground">{s.category?.name || "—"}</p>
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="font-semibold text-primary">
+                            {s.price ? `₹${s.price} ${s.unit?.replace(/_/g, " ")}` : "Quote"}
+                          </span>
+                          <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                            <Eye className="h-3 w-3" /> {s.view_count || 0} views
+                          </span>
+                        </div>
+                        <div className="flex flex-wrap gap-1">
+                          {s.city && <Badge variant="outline" className="text-xs"><MapPin className="h-3 w-3 mr-1" />{s.city}</Badge>}
+                          {s.emergency_service && <Badge variant="destructive" className="text-xs"><Shield className="h-3 w-3 mr-1" />24×7</Badge>}
+                          {s.response_time && <Badge variant="outline" className="text-xs"><Clock className="h-3 w-3 mr-1" />{s.response_time}</Badge>}
+                        </div>
+                        <div className="flex gap-2 pt-1">
+                          <Button size="sm" variant="outline" className="flex-1" onClick={() => openEdit(s)}>
+                            <Edit className="h-4 w-4 mr-1" /> Edit
+                          </Button>
+                          <Button size="sm" variant="destructive" onClick={() => del.mutate(s.id)}>
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
                 </div>
               ) : (
                 <div className="overflow-x-auto">
@@ -518,6 +577,7 @@ export default function SellerServices() {
                         <TableHead>Category</TableHead>
                         <TableHead>Price</TableHead>
                         <TableHead>City</TableHead>
+                        <TableHead>Views</TableHead>
                         <TableHead>Active</TableHead>
                         <TableHead>Actions</TableHead>
                       </TableRow>
@@ -537,6 +597,7 @@ export default function SellerServices() {
                           <TableCell>{s.category?.name || "—"}</TableCell>
                           <TableCell>{s.price ? `₹${s.price} ${s.unit?.replace("_", " ")}` : "Quote"}</TableCell>
                           <TableCell><span className="inline-flex items-center gap-1"><MapPin className="h-3 w-3" />{s.city || "—"}</span></TableCell>
+                          <TableCell><span className="inline-flex items-center gap-1"><Eye className="h-3 w-3" />{s.view_count || 0}</span></TableCell>
                           <TableCell>
                             <Switch checked={s.is_active} onCheckedChange={(v) => toggleActive.mutate({ id: s.id, is_active: v })} />
                           </TableCell>

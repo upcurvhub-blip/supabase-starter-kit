@@ -33,6 +33,11 @@ import {
   Heart,
   Share2,
   MessageSquare,
+  Instagram,
+  Facebook,
+  Linkedin,
+  Twitter,
+  Youtube,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { ShareDialog } from "@/components/ShareDialog";
@@ -112,6 +117,23 @@ export default function SellerProfile() {
     },
     enabled: !!sellerId,
   });
+
+  // Fetch seller services
+  const { data: services } = useQuery({
+    queryKey: ["seller-services-public", sellerId],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("services")
+        .select("*, categories:category_id(name)")
+        .eq("seller_id", sellerId)
+        .eq("is_active", true)
+        .order("created_at", { ascending: false });
+      return data || [];
+    },
+    enabled: !!sellerId,
+  });
+
+
 
   // Fetch reviews
   const { data: reviews } = useQuery({
@@ -538,6 +560,12 @@ export default function SellerProfile() {
             >
               Products ({products?.length || 0})
             </TabsTrigger>
+            <TabsTrigger
+              value="services"
+              className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-6 py-3"
+            >
+              Services ({services?.length || 0})
+            </TabsTrigger>
             <TabsTrigger 
               value="about" 
               className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-6 py-3"
@@ -619,6 +647,87 @@ export default function SellerProfile() {
             )}
           </TabsContent>
 
+          {/* Services Tab */}
+          <TabsContent value="services">
+            {services && services.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {services.map((service: any) => (
+                  <Link key={service.id} to={`/service/${service.slug || service.id}`}>
+                    <Card className="h-full group overflow-hidden hover:shadow-lg transition-shadow">
+                      <div className="aspect-video relative overflow-hidden bg-muted">
+                        {service.images?.length ? (
+                          <img
+                            src={service.images[0]}
+                            alt={service.title}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <Award className="h-12 w-12 text-muted-foreground/30" />
+                          </div>
+                        )}
+                        {service.emergency_service && (
+                          <Badge className="absolute top-2 left-2 bg-accent text-accent-foreground">
+                            24x7
+                          </Badge>
+                        )}
+                      </div>
+                      <CardContent className="p-4">
+                        <h3 className="font-medium line-clamp-2 mb-1 group-hover:text-primary transition-colors">
+                          {service.title}
+                        </h3>
+                        {service.categories?.name && (
+                          <p className="text-xs text-muted-foreground mb-2">{service.categories.name}</p>
+                        )}
+                        <div className="flex items-center justify-between text-sm">
+                          {service.price ? (
+                            <span className="flex items-center font-semibold text-primary">
+                              <IndianRupee className="h-3 w-3" />
+                              {Number(service.price).toLocaleString()}
+                              {service.unit && (
+                                <span className="ml-1 text-xs font-normal text-muted-foreground">
+                                  {service.unit.replace(/_/g, " ")}
+                                </span>
+                              )}
+                            </span>
+                          ) : (
+                            <span className="text-xs text-muted-foreground">Price on request</span>
+                          )}
+                          <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                            <TrendingUp className="h-3 w-3" /> {service.view_count || 0} views
+                          </span>
+                        </div>
+                        {(service.city || service.response_time) && (
+                          <div className="mt-2 flex items-center gap-3 text-xs text-muted-foreground">
+                            {service.city && (
+                              <span className="flex items-center gap-1">
+                                <MapPin className="h-3 w-3" /> {service.city}
+                              </span>
+                            )}
+                            {service.response_time && (
+                              <span className="flex items-center gap-1">
+                                <Clock className="h-3 w-3" /> {service.response_time}
+                              </span>
+                            )}
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  </Link>
+                ))}
+              </div>
+            ) : (
+              <Card>
+                <CardContent className="py-16 text-center">
+                  <Award className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                  <p className="text-muted-foreground">No services listed yet</p>
+                </CardContent>
+              </Card>
+            )}
+          </TabsContent>
+
+
+
           {/* Gallery Tab */}
           <TabsContent value="gallery">
             <GalleryView items={((seller as any)?.gallery as GalleryItem[]) || []} />
@@ -686,6 +795,38 @@ export default function SellerProfile() {
                       </p>
                     </div>
                   </div>
+
+                  {(() => {
+                    const links = ((seller as any)?.social_links || {}) as Record<string, string>;
+                    const items = [
+                      { key: "instagram", label: "Instagram", Icon: Instagram },
+                      { key: "facebook", label: "Facebook", Icon: Facebook },
+                      { key: "linkedin", label: "LinkedIn", Icon: Linkedin },
+                      { key: "twitter", label: "Twitter", Icon: Twitter },
+                      { key: "youtube", label: "YouTube", Icon: Youtube },
+                    ].filter((i) => !!links[i.key]);
+                    if (!items.length) return null;
+                    return (
+                      <div>
+                        <p className="font-medium mb-2">Follow us</p>
+                        <div className="flex flex-wrap gap-2">
+                          {items.map(({ key, label, Icon }) => (
+                            <a
+                              key={key}
+                              href={links[key]}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              aria-label={label}
+                              title={label}
+                              className="inline-flex h-9 w-9 items-center justify-center rounded-full border text-muted-foreground transition-colors hover:border-primary hover:text-primary"
+                            >
+                              <Icon className="h-4 w-4" />
+                            </a>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })()}
 
                   {seller.website && (
                     <div className="flex items-center gap-3">
