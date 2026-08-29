@@ -10,6 +10,25 @@ import { ensureDeviceId } from "@/hooks/useDeviceId";
 import { useToast } from "@/hooks/use-toast";
 import { requestPopup, releasePopup, onExitIntent, onIdle, exitIntentFired, markExitIntentFired } from "@/lib/popupGate";
 
+const SNOOZE_KEY = "upcurv_intent_snooze_until";
+const SNOOZE_MS = 10 * 60 * 1000; // 10 minutes
+
+function isSnoozed() {
+  try {
+    return Date.now() < Number(sessionStorage.getItem(SNOOZE_KEY) || 0);
+  } catch {
+    return false;
+  }
+}
+
+function snooze() {
+  try {
+    sessionStorage.setItem(SNOOZE_KEY, String(Date.now() + SNOOZE_MS));
+  } catch {
+    /* storage unavailable */
+  }
+}
+
 export function ShoppingIntentDialog() {
   const { intent, ready, setIntent } = useShoppingIntent();
   const [open, setOpen] = useState(false);
@@ -20,15 +39,24 @@ export function ShoppingIntentDialog() {
   const location = useLocation();
   const { toast } = useToast();
 
+  const dismiss = () => {
+    snooze();
+    setOpen(false);
+  };
+
   // Behaviour-driven: exit-intent first, idle nudge as a fallback. Never a
   // pure timer, and always through the sitewide one-popup-at-a-time gate.
+  // Once shown and dismissed, it stays away for 10 minutes (per session).
   useEffect(() => {
     if (!ready || intent) return;
+    if (isSnoozed()) return;
 
     const show = (fromExit: boolean) => {
+      if (isSnoozed()) return;
       if (!fromExit && exitIntentFired()) return;
       if (!requestPopup("shopping-intent")) return;
       if (fromExit) markExitIntentFired();
+      snooze();
       setOpen(true);
     };
 
