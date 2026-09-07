@@ -2133,6 +2133,59 @@ export type Database = {
           },
         ]
       }
+      seller_claims: {
+        Row: {
+          business_name: string
+          contact_name: string | null
+          created_at: string
+          email: string | null
+          id: string
+          message: string | null
+          notes: string | null
+          page_path: string | null
+          phone: string
+          seller_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          business_name: string
+          contact_name?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          message?: string | null
+          notes?: string | null
+          page_path?: string | null
+          phone: string
+          seller_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          business_name?: string
+          contact_name?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          message?: string | null
+          notes?: string | null
+          page_path?: string | null
+          phone?: string
+          seller_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "seller_claims_seller_id_fkey"
+            columns: ["seller_id"]
+            isOneToOne: false
+            referencedRelation: "seller_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       seller_profiles: {
         Row: {
           about: string | null
@@ -2149,10 +2202,13 @@ export type Database = {
           certifications: Json | null
           cin: string | null
           city: string | null
+          claim_status: string
+          claimed_at: string | null
           company_name: string | null
           converted_leads: number | null
           country: string | null
           created_at: string
+          created_by_admin: boolean
           deal_success_score: number
           description: string | null
           dispute_penalty: number
@@ -2195,7 +2251,7 @@ export type Database = {
           total_reviews: number | null
           trust_score: number | null
           updated_at: string
-          user_id: string
+          user_id: string | null
           verification_status: string | null
           website: string | null
           whatsapp: string | null
@@ -2216,10 +2272,13 @@ export type Database = {
           certifications?: Json | null
           cin?: string | null
           city?: string | null
+          claim_status?: string
+          claimed_at?: string | null
           company_name?: string | null
           converted_leads?: number | null
           country?: string | null
           created_at?: string
+          created_by_admin?: boolean
           deal_success_score?: number
           description?: string | null
           dispute_penalty?: number
@@ -2262,7 +2321,7 @@ export type Database = {
           total_reviews?: number | null
           trust_score?: number | null
           updated_at?: string
-          user_id: string
+          user_id?: string | null
           verification_status?: string | null
           website?: string | null
           whatsapp?: string | null
@@ -2283,10 +2342,13 @@ export type Database = {
           certifications?: Json | null
           cin?: string | null
           city?: string | null
+          claim_status?: string
+          claimed_at?: string | null
           company_name?: string | null
           converted_leads?: number | null
           country?: string | null
           created_at?: string
+          created_by_admin?: boolean
           deal_success_score?: number
           description?: string | null
           dispute_penalty?: number
@@ -2329,7 +2391,7 @@ export type Database = {
           total_reviews?: number | null
           trust_score?: number | null
           updated_at?: string
-          user_id?: string
+          user_id?: string | null
           verification_status?: string | null
           website?: string | null
           whatsapp?: string | null
