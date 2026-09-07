@@ -12,6 +12,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { GalleryView, type GalleryItem } from "@/components/seller/GalleryView";
 import { Separator } from "@/components/ui/separator";
 import { ReviewForm } from "@/components/ReviewForm";
+import { ClaimBusinessDialog } from "@/components/seller/ClaimBusinessDialog";
+
 import { StarRating } from "@/components/StarRating";
 import {
   Building2,
@@ -550,6 +552,14 @@ export default function SellerProfile() {
             </div>
           </CardContent>
         </Card>
+
+        {(seller as any).claim_status && (seller as any).claim_status !== "claimed" && (
+          <div className="mb-6">
+            <ClaimBusinessDialog sellerId={seller.id} businessName={sellerName} />
+          </div>
+        )}
+
+
 
         {/* Content Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>

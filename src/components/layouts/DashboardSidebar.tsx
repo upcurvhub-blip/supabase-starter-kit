@@ -51,6 +51,8 @@ const adminLinks: SidebarLink[] = [
   { label: "Today's Analysis", href: "/admin/today", icon: Clock },
   { label: "Daily Operations", href: "/admin/daily-ops", icon: Clock },
   { label: "Manage Sellers", href: "/admin/sellers", icon: Briefcase },
+  { label: "Business Listings", href: "/admin/business-profiles", icon: Building2 },
+
   { label: "Categories", href: "/admin/categories", icon: Tag },
   { label: "Requirements", href: "/admin/requirements", icon: FileText },
   { label: "Lead Pricing", href: "/admin/pricing", icon: DollarSign },
