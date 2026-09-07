@@ -64,7 +64,7 @@ ${shards.map(s => `  <sitemap><loc>${BASE}/functions/v1/sitemap-xml?s=${s}</loc>
     }
 
     if (section === "sellers") {
-      const { data } = await sb.from("seller_profiles").select("slug, id, updated_at").eq("status", "approved").limit(10000);
+      const { data } = await sb.from("seller_profiles").select("slug, id, updated_at").or("status.eq.approved,is_approved.eq.true").limit(50000);
       return new Response(urlset((data || []).map((s: any) => ({ loc: `${BASE}/seller-profile/${s.slug || s.id}`, lastmod: s.updated_at?.slice(0, 10), changefreq: "weekly", priority: "0.7" }))), { headers: HEADERS });
     }
 
