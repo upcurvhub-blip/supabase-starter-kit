@@ -45,8 +45,10 @@ const sellerLinks: SidebarLink[] = [
 const adminLinks: SidebarLink[] = [
   { label: "Dashboard", href: "/admin", icon: LayoutDashboard },
   { label: "Today Analysis", href: "/admin/today", icon: CalendarDays },
+  { label: "Daily Operations", href: "/admin/daily-ops", icon: ClipboardList },
   { label: "Analytics", href: "/admin/analytics", icon: BarChart3 },
   { label: "Manage Sellers", href: "/admin/sellers", icon: Briefcase },
+  { label: "Business Listings", href: "/admin/business-profiles", icon: Building2 },
   { label: "Categories", href: "/admin/categories", icon: Tag },
   { label: "Local Landing Pages", href: "/admin/local-pages", icon: MapPin },
   { label: "Ads Manager", href: "/admin/ads", icon: Sparkles },
@@ -54,8 +56,10 @@ const adminLinks: SidebarLink[] = [
   { label: "Lead Pricing", href: "/admin/pricing", icon: DollarSign },
   { label: "All Leads", href: "/admin/leads", icon: MessageSquare },
   { label: "Auto Leads", href: "/admin/auto-leads", icon: Sparkles },
+  { label: "Business Leads", href: "/admin/business-leads", icon: Users },
   { label: "Requirements", href: "/admin/requirements", icon: ClipboardList },
   { label: "SEO Console", href: "/admin/seo", icon: Sparkles },
+  { label: "SEO Playbook", href: "/admin/seo-guide", icon: FileText },
   { label: "Platform Settings", href: "/admin/settings", icon: Settings },
 ];
 
