@@ -356,6 +356,12 @@ export default function BusinessProfiles() {
       niches: Array.isArray(row.niches) ? row.niches.join(", ") : "",
       established_year: row.established_year ? String(row.established_year) : "",
       about: row.about || row.description || "",
+      social_instagram: (row.social_links as any)?.instagram || "",
+      social_facebook: (row.social_links as any)?.facebook || "",
+      social_linkedin: (row.social_links as any)?.linkedin || "",
+      social_twitter: (row.social_links as any)?.twitter || "",
+      social_youtube: (row.social_links as any)?.youtube || "",
+
     } as FormState);
 
   return (
