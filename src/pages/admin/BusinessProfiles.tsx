@@ -759,6 +759,14 @@ export default function BusinessProfiles() {
                   </div>
                 </div>
               )}
+
+              {form.id && (
+                <div className="pt-2 border-t space-y-2">
+                  <Label>Photo & video gallery</Label>
+                  <GalleryManager sellerId={form.id} seoName={form.business_name} />
+                </div>
+              )}
+
             </div>
           )}
           <DialogFooter>
