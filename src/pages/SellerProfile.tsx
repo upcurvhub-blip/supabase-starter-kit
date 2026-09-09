@@ -40,10 +40,13 @@ import {
   Linkedin,
   Twitter,
   Youtube,
+  MessageCircle,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { ShareDialog } from "@/components/ShareDialog";
+import { trackSellerCta } from "@/lib/sellerCtaTracking";
 import { getDeviceId, hasDeviceConsent } from "@/hooks/useDeviceId";
+
 
 const getEphemeralSessionId = () => {
   if (typeof window === "undefined") return `session_${Date.now()}`;
@@ -427,7 +430,20 @@ export default function SellerProfile() {
           />
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
+        <button
+          type="button"
+          aria-label={isSaved ? "Remove from saved businesses" : "Save this business"}
+          onClick={() => {
+            trackSellerCta(seller.id, "like", sellerName);
+            toggleSave.mutate();
+          }}
+          disabled={toggleSave.isPending}
+          className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-card/80 shadow-md backdrop-blur transition-transform active:scale-95"
+        >
+          <Heart className={`h-5 w-5 ${isSaved ? "fill-destructive text-destructive" : "text-foreground"}`} />
+        </button>
       </div>
+
 
       <div className="container mx-auto px-4 -mt-20 relative z-10 pb-12">
         {/* Profile Header */}
@@ -490,18 +506,47 @@ export default function SellerProfile() {
                   </div>
 
                   {/* Action Buttons */}
-                  <div className="flex gap-2">
+                  <div className="flex flex-wrap gap-2">
+                    {(seller.whatsapp || seller.phone) && (
+                      <Button
+                        size="sm"
+                        className="bg-[#25D366] text-white hover:bg-[#1eb959]"
+                        asChild
+                        onClick={() => trackSellerCta(seller.id, "whatsapp", sellerName)}
+                      >
+                        <a
+                          href={`https://wa.me/${String(seller.whatsapp || seller.phone).replace(/\D/g, "")}?text=${encodeURIComponent(
+                            `Hi ${sellerName}, I found your business on Upcurv Trade and would like to know more about your products/services.`,
+                          )}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <MessageCircle className="h-4 w-4 mr-1" /> WhatsApp
+                        </a>
+                      </Button>
+                    )}
+                    {seller.phone && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        asChild
+                        onClick={() => trackSellerCta(seller.id, "call", sellerName)}
+                      >
+                        <a href={`tel:${seller.phone}`}>
+                          <Phone className="h-4 w-4 mr-1" /> Call
+                        </a>
+                      </Button>
+                    )}
                     <Button
-                      variant={isSaved ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => toggleSave.mutate()}
-                      disabled={toggleSave.isPending}
+                      variant="outline"
+                      size="icon"
+                      aria-label="Share this business"
+                      onClick={() => {
+                        trackSellerCta(seller.id, "share", sellerName);
+                        setShareOpen(true);
+                      }}
                     >
-                      <Heart className={`h-4 w-4 mr-1 ${isSaved ? "fill-current" : ""}`} />
-                      {isSaved ? "Saved" : "Save"}
-                    </Button>
-                    <Button variant="outline" size="sm" onClick={() => setShareOpen(true)}>
-                      <Share2 className="h-4 w-4 mr-1" /> Share
+                      <Share2 className="h-4 w-4" />
                     </Button>
                     <ShareDialog
                       open={shareOpen}
@@ -510,6 +555,7 @@ export default function SellerProfile() {
                       text={`${seller?.business_name || seller?.company_name || "This supplier"}${seller?.city ? ` in ${seller.city}` : ""} on Upcurv Trade`}
                     />
                   </div>
+
                 </div>
               </div>
             </div>

@@ -30,7 +30,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
 import { SearchSuggest } from "@/components/SearchSuggest";
+import { MobileBottomBar } from "@/components/MobileBottomBar";
 import { IntentSwitcher } from "@/components/intent/IntentSwitcher";
+
 
 interface MarketplaceLayoutProps {
   children: React.ReactNode;
@@ -228,7 +230,9 @@ export function MarketplaceLayout({ children, showSearch = true, hideMobileCta =
       </header>
 
       {/* Main */}
-      <main className="flex-1">{children}</main>
+      <main className="flex-1 pb-24 md:pb-0">{children}</main>
+      <MobileBottomBar />
+
 
       {/* Footer */}
       <footer className="border-t bg-card mt-12">

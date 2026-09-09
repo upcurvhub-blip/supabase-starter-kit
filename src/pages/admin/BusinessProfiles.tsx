@@ -14,6 +14,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { SellerImageUpload } from "@/components/SellerImageUpload";
+import { GalleryManager } from "@/components/seller/GalleryManager";
+import { INDIAN_STATES, districtsForState } from "@/lib/india";
+
 import { useToast } from "@/hooks/use-toast";
 import { notifyIndex } from "@/lib/notifyIndex";
 import { Link } from "react-router-dom";
@@ -50,7 +53,23 @@ const EMPTY = {
   verification_status: "unverified",
   is_featured: false,
   niches: "",
+  social_instagram: "",
+  social_facebook: "",
+  social_linkedin: "",
+  social_twitter: "",
+  social_youtube: "",
 };
+
+export const EMPLOYEE_COUNTS = ["1-10", "11-50", "51-100", "101-250", "251-500", "501-1000", "1000+"];
+export const TURNOVER_RANGES = [
+  "Up to ₹50 Lakh",
+  "₹50 Lakh - ₹1 Crore",
+  "₹1 - 5 Crore",
+  "₹5 - 25 Crore",
+  "₹25 - 100 Crore",
+  "₹100+ Crore",
+];
+
 
 type FormState = typeof EMPTY;
 
@@ -194,6 +213,18 @@ export default function BusinessProfiles() {
         verification_status: f.verification_status,
         is_featured: f.is_featured,
         niches: f.niches ? f.niches.split(",").map((n) => n.trim()).filter(Boolean) : [],
+        business_category:
+          (categories || []).find((c: any) => c.id === f.primary_category_id)?.name || null,
+        social_links: Object.fromEntries(
+          Object.entries({
+            instagram: f.social_instagram.trim(),
+            facebook: f.social_facebook.trim(),
+            linkedin: f.social_linkedin.trim(),
+            twitter: f.social_twitter.trim(),
+            youtube: f.social_youtube.trim(),
+          }).filter(([, v]) => v),
+        ),
+
       };
       if (!payload.business_name) throw new Error("Business name is required");
 
@@ -325,6 +356,12 @@ export default function BusinessProfiles() {
       niches: Array.isArray(row.niches) ? row.niches.join(", ") : "",
       established_year: row.established_year ? String(row.established_year) : "",
       about: row.about || row.description || "",
+      social_instagram: (row.social_links as any)?.instagram || "",
+      social_facebook: (row.social_links as any)?.facebook || "",
+      social_linkedin: (row.social_links as any)?.linkedin || "",
+      social_twitter: (row.social_links as any)?.twitter || "",
+      social_youtube: (row.social_links as any)?.youtube || "",
+
     } as FormState);
 
   return (
@@ -570,13 +607,37 @@ export default function BusinessProfiles() {
                   <Input value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} />
                 </div>
                 <div className="space-y-1.5">
-                  <Label>City</Label>
-                  <Input value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} />
+                  <Label>State</Label>
+                  <Select
+                    value={form.state || undefined}
+                    onValueChange={(v) =>
+                      setForm({
+                        ...form,
+                        state: v,
+                        city: districtsForState(v).includes(form.city) ? form.city : "",
+                      })
+                    }
+                  >
+                    <SelectTrigger><SelectValue placeholder="Select state" /></SelectTrigger>
+                    <SelectContent className="max-h-72">
+                      {INDIAN_STATES.map((s) => (
+                        <SelectItem key={s} value={s}>{s}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="space-y-1.5">
-                  <Label>State</Label>
-                  <Input value={form.state} onChange={(e) => setForm({ ...form, state: e.target.value })} />
+                  <Label>City / District</Label>
+                  <Select value={form.city || undefined} onValueChange={(v) => setForm({ ...form, city: v })} disabled={!form.state}>
+                    <SelectTrigger><SelectValue placeholder={form.state ? "Select city" : "Select state first"} /></SelectTrigger>
+                    <SelectContent className="max-h-72">
+                      {districtsForState(form.state).map((d) => (
+                        <SelectItem key={d} value={d}>{d}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
+
                 <div className="space-y-1.5">
                   <Label>Pincode</Label>
                   <Input value={form.pincode} onChange={(e) => setForm({ ...form, pincode: e.target.value })} />
@@ -595,12 +656,27 @@ export default function BusinessProfiles() {
                 </div>
                 <div className="space-y-1.5">
                   <Label>Employee count</Label>
-                  <Input value={form.employee_count} onChange={(e) => setForm({ ...form, employee_count: e.target.value })} />
+                  <Select value={form.employee_count || undefined} onValueChange={(v) => setForm({ ...form, employee_count: v })}>
+                    <SelectTrigger><SelectValue placeholder="Select range" /></SelectTrigger>
+                    <SelectContent>
+                      {EMPLOYEE_COUNTS.map((s) => (
+                        <SelectItem key={s} value={s}>{s}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="space-y-1.5">
                   <Label>Annual turnover</Label>
-                  <Input value={form.annual_turnover} onChange={(e) => setForm({ ...form, annual_turnover: e.target.value })} />
+                  <Select value={form.annual_turnover || undefined} onValueChange={(v) => setForm({ ...form, annual_turnover: v })}>
+                    <SelectTrigger><SelectValue placeholder="Select range" /></SelectTrigger>
+                    <SelectContent>
+                      {TURNOVER_RANGES.map((s) => (
+                        <SelectItem key={s} value={s}>{s}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
+
                 <div className="space-y-1.5">
                   <Label>Listing status</Label>
                   <Select value={form.status} onValueChange={(v) => setForm({ ...form, status: v })}>
@@ -628,6 +704,25 @@ export default function BusinessProfiles() {
                   <Label>Featured listing</Label>
                 </div>
               </div>
+
+              <div className="grid gap-4 md:grid-cols-2 pt-2 border-t">
+                {([
+                  ["social_instagram", "Instagram URL"],
+                  ["social_facebook", "Facebook URL"],
+                  ["social_linkedin", "LinkedIn URL"],
+                  ["social_twitter", "X / Twitter URL"],
+                  ["social_youtube", "YouTube URL"],
+                ] as const).map(([key, label]) => (
+                  <div key={key} className="space-y-1.5">
+                    <Label>{label}</Label>
+                    <Input
+                      value={(form as any)[key]}
+                      onChange={(e) => setForm({ ...form, [key]: e.target.value } as FormState)}
+                    />
+                  </div>
+                ))}
+              </div>
+
 
               {form.id ? (
                 <div className="grid gap-4 md:grid-cols-2 pt-2 border-t">
@@ -664,6 +759,14 @@ export default function BusinessProfiles() {
                   </div>
                 </div>
               )}
+
+              {form.id && (
+                <div className="pt-2 border-t space-y-2">
+                  <Label>Photo & video gallery</Label>
+                  <GalleryManager sellerId={form.id} seoName={form.business_name} />
+                </div>
+              )}
+
             </div>
           )}
           <DialogFooter>
