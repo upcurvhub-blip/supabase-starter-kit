@@ -607,13 +607,37 @@ export default function BusinessProfiles() {
                   <Input value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} />
                 </div>
                 <div className="space-y-1.5">
-                  <Label>City</Label>
-                  <Input value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} />
+                  <Label>State</Label>
+                  <Select
+                    value={form.state || undefined}
+                    onValueChange={(v) =>
+                      setForm({
+                        ...form,
+                        state: v,
+                        city: districtsForState(v).includes(form.city) ? form.city : "",
+                      })
+                    }
+                  >
+                    <SelectTrigger><SelectValue placeholder="Select state" /></SelectTrigger>
+                    <SelectContent className="max-h-72">
+                      {INDIAN_STATES.map((s) => (
+                        <SelectItem key={s} value={s}>{s}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="space-y-1.5">
-                  <Label>State</Label>
-                  <Input value={form.state} onChange={(e) => setForm({ ...form, state: e.target.value })} />
+                  <Label>City / District</Label>
+                  <Select value={form.city || undefined} onValueChange={(v) => setForm({ ...form, city: v })} disabled={!form.state}>
+                    <SelectTrigger><SelectValue placeholder={form.state ? "Select city" : "Select state first"} /></SelectTrigger>
+                    <SelectContent className="max-h-72">
+                      {districtsForState(form.state).map((d) => (
+                        <SelectItem key={d} value={d}>{d}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
+
                 <div className="space-y-1.5">
                   <Label>Pincode</Label>
                   <Input value={form.pincode} onChange={(e) => setForm({ ...form, pincode: e.target.value })} />
