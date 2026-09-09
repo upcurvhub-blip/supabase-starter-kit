@@ -30,7 +30,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
 import { SearchSuggest } from "@/components/SearchSuggest";
+import { MobileBottomBar } from "@/components/MobileBottomBar";
 import { IntentSwitcher } from "@/components/intent/IntentSwitcher";
+
 
 interface MarketplaceLayoutProps {
   children: React.ReactNode;
