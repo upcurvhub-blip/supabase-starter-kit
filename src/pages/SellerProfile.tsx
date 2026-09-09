@@ -490,18 +490,47 @@ export default function SellerProfile() {
                   </div>
 
                   {/* Action Buttons */}
-                  <div className="flex gap-2">
+                  <div className="flex flex-wrap gap-2">
+                    {(seller.whatsapp || seller.phone) && (
+                      <Button
+                        size="sm"
+                        className="bg-[#25D366] text-white hover:bg-[#1eb959]"
+                        asChild
+                        onClick={() => trackSellerCta(seller.id, "whatsapp", sellerName)}
+                      >
+                        <a
+                          href={`https://wa.me/${String(seller.whatsapp || seller.phone).replace(/\D/g, "")}?text=${encodeURIComponent(
+                            `Hi ${sellerName}, I found your business on Upcurv Trade and would like to know more about your products/services.`,
+                          )}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <MessageCircle className="h-4 w-4 mr-1" /> WhatsApp
+                        </a>
+                      </Button>
+                    )}
+                    {seller.phone && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        asChild
+                        onClick={() => trackSellerCta(seller.id, "call", sellerName)}
+                      >
+                        <a href={`tel:${seller.phone}`}>
+                          <Phone className="h-4 w-4 mr-1" /> Call
+                        </a>
+                      </Button>
+                    )}
                     <Button
-                      variant={isSaved ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => toggleSave.mutate()}
-                      disabled={toggleSave.isPending}
+                      variant="outline"
+                      size="icon"
+                      aria-label="Share this business"
+                      onClick={() => {
+                        trackSellerCta(seller.id, "share", sellerName);
+                        setShareOpen(true);
+                      }}
                     >
-                      <Heart className={`h-4 w-4 mr-1 ${isSaved ? "fill-current" : ""}`} />
-                      {isSaved ? "Saved" : "Save"}
-                    </Button>
-                    <Button variant="outline" size="sm" onClick={() => setShareOpen(true)}>
-                      <Share2 className="h-4 w-4 mr-1" /> Share
+                      <Share2 className="h-4 w-4" />
                     </Button>
                     <ShareDialog
                       open={shareOpen}
@@ -510,6 +539,7 @@ export default function SellerProfile() {
                       text={`${seller?.business_name || seller?.company_name || "This supplier"}${seller?.city ? ` in ${seller.city}` : ""} on Upcurv Trade`}
                     />
                   </div>
+
                 </div>
               </div>
             </div>
