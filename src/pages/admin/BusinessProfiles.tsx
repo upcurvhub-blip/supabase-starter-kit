@@ -656,12 +656,27 @@ export default function BusinessProfiles() {
                 </div>
                 <div className="space-y-1.5">
                   <Label>Employee count</Label>
-                  <Input value={form.employee_count} onChange={(e) => setForm({ ...form, employee_count: e.target.value })} />
+                  <Select value={form.employee_count || undefined} onValueChange={(v) => setForm({ ...form, employee_count: v })}>
+                    <SelectTrigger><SelectValue placeholder="Select range" /></SelectTrigger>
+                    <SelectContent>
+                      {EMPLOYEE_COUNTS.map((s) => (
+                        <SelectItem key={s} value={s}>{s}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="space-y-1.5">
                   <Label>Annual turnover</Label>
-                  <Input value={form.annual_turnover} onChange={(e) => setForm({ ...form, annual_turnover: e.target.value })} />
+                  <Select value={form.annual_turnover || undefined} onValueChange={(v) => setForm({ ...form, annual_turnover: v })}>
+                    <SelectTrigger><SelectValue placeholder="Select range" /></SelectTrigger>
+                    <SelectContent>
+                      {TURNOVER_RANGES.map((s) => (
+                        <SelectItem key={s} value={s}>{s}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
+
                 <div className="space-y-1.5">
                   <Label>Listing status</Label>
                   <Select value={form.status} onValueChange={(v) => setForm({ ...form, status: v })}>
