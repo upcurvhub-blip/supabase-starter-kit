@@ -22,7 +22,7 @@ export function FloatingActions() {
   if (hidden) return null;
 
   return (
-    <div className="fixed bottom-5 right-4 md:bottom-6 md:right-6 z-40 flex flex-col items-end gap-2">
+    <div className="fixed bottom-24 right-4 md:bottom-6 md:right-6 z-40 flex flex-col items-end gap-2">
       {ACTIONS.map((a, i) => (
         <Link
           key={a.to}
