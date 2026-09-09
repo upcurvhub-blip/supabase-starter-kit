@@ -50,7 +50,23 @@ const EMPTY = {
   verification_status: "unverified",
   is_featured: false,
   niches: "",
+  social_instagram: "",
+  social_facebook: "",
+  social_linkedin: "",
+  social_twitter: "",
+  social_youtube: "",
 };
+
+export const EMPLOYEE_COUNTS = ["1-10", "11-50", "51-100", "101-250", "251-500", "501-1000", "1000+"];
+export const TURNOVER_RANGES = [
+  "Up to ₹50 Lakh",
+  "₹50 Lakh - ₹1 Crore",
+  "₹1 - 5 Crore",
+  "₹5 - 25 Crore",
+  "₹25 - 100 Crore",
+  "₹100+ Crore",
+];
+
 
 type FormState = typeof EMPTY;
 
