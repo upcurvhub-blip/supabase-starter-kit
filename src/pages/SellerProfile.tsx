@@ -40,10 +40,13 @@ import {
   Linkedin,
   Twitter,
   Youtube,
+  MessageCircle,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { ShareDialog } from "@/components/ShareDialog";
+import { trackSellerCta } from "@/lib/sellerCtaTracking";
 import { getDeviceId, hasDeviceConsent } from "@/hooks/useDeviceId";
+
 
 const getEphemeralSessionId = () => {
   if (typeof window === "undefined") return `session_${Date.now()}`;
