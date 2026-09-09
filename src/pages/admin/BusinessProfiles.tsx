@@ -213,6 +213,18 @@ export default function BusinessProfiles() {
         verification_status: f.verification_status,
         is_featured: f.is_featured,
         niches: f.niches ? f.niches.split(",").map((n) => n.trim()).filter(Boolean) : [],
+        business_category:
+          (categories || []).find((c: any) => c.id === f.primary_category_id)?.name || null,
+        social_links: Object.fromEntries(
+          Object.entries({
+            instagram: f.social_instagram.trim(),
+            facebook: f.social_facebook.trim(),
+            linkedin: f.social_linkedin.trim(),
+            twitter: f.social_twitter.trim(),
+            youtube: f.social_youtube.trim(),
+          }).filter(([, v]) => v),
+        ),
+
       };
       if (!payload.business_name) throw new Error("Business name is required");
 
