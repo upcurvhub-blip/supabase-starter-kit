@@ -705,6 +705,25 @@ export default function BusinessProfiles() {
                 </div>
               </div>
 
+              <div className="grid gap-4 md:grid-cols-2 pt-2 border-t">
+                {([
+                  ["social_instagram", "Instagram URL"],
+                  ["social_facebook", "Facebook URL"],
+                  ["social_linkedin", "LinkedIn URL"],
+                  ["social_twitter", "X / Twitter URL"],
+                  ["social_youtube", "YouTube URL"],
+                ] as const).map(([key, label]) => (
+                  <div key={key} className="space-y-1.5">
+                    <Label>{label}</Label>
+                    <Input
+                      value={(form as any)[key]}
+                      onChange={(e) => setForm({ ...form, [key]: e.target.value } as FormState)}
+                    />
+                  </div>
+                ))}
+              </div>
+
+
               {form.id ? (
                 <div className="grid gap-4 md:grid-cols-2 pt-2 border-t">
                   <div className="space-y-2">
