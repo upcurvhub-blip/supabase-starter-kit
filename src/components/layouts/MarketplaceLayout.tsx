@@ -228,7 +228,9 @@ export function MarketplaceLayout({ children, showSearch = true, hideMobileCta =
       </header>
 
       {/* Main */}
-      <main className="flex-1">{children}</main>
+      <main className="flex-1 pb-24 md:pb-0">{children}</main>
+      <MobileBottomBar />
+
 
       {/* Footer */}
       <footer className="border-t bg-card mt-12">
