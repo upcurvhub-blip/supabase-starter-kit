@@ -430,7 +430,20 @@ export default function SellerProfile() {
           />
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
+        <button
+          type="button"
+          aria-label={isSaved ? "Remove from saved businesses" : "Save this business"}
+          onClick={() => {
+            trackSellerCta(seller.id, "like", sellerName);
+            toggleSave.mutate();
+          }}
+          disabled={toggleSave.isPending}
+          className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-card/80 shadow-md backdrop-blur transition-transform active:scale-95"
+        >
+          <Heart className={`h-5 w-5 ${isSaved ? "fill-destructive text-destructive" : "text-foreground"}`} />
+        </button>
       </div>
+
 
       <div className="container mx-auto px-4 -mt-20 relative z-10 pb-12">
         {/* Profile Header */}
