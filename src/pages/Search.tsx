@@ -217,6 +217,142 @@ export default function Search() {
     [products, prefCity],
   );
 
+  /**
+   * Blended result feed: matching businesses and services are dropped in
+   * between products (one every 4 products) so buyers discover suppliers
+   * without leaving the results list. Each carries its own visual style.
+   */
+  type FeedItem = { type: "product" | "business" | "service"; data: any };
+  const feed = useMemo<FeedItem[]>(() => {
+    const extras: FeedItem[] = [
+      ...businesses.map((b) => ({ type: "business" as const, data: b })),
+      ...servicesFound.map((s) => ({ type: "service" as const, data: s })),
+    ];
+    const out: FeedItem[] = [];
+    let e = 0;
+    visibleProducts.forEach((p: any, i: number) => {
+      out.push({ type: "product", data: p });
+      if ((i + 1) % 4 === 0 && e < extras.length) out.push(extras[e++]);
+    });
+    while (e < extras.length) out.push(extras[e++]);
+    return out;
+  }, [visibleProducts, businesses, servicesFound]);
+
+  const businessCard = (b: any, compact = false) => {
+    const name = b.business_name || b.company_name || "Business";
+    const wa = String(b.whatsapp || b.phone || "").replace(/\D/g, "");
+    return (
+      <div
+        key={`b-${b.id}`}
+        className={`relative border-l-4 border-l-accent bg-accent/5 ${compact ? "p-3" : "rounded-xl border p-4"}`}
+      >
+        <Badge className="mb-2 bg-accent text-accent-foreground">
+          <Building2 className="mr-1 h-3 w-3" /> Business
+        </Badge>
+        <div className="flex gap-3">
+          <Link
+            to={`/seller-profile/${b.slug || b.id}`}
+            className="h-14 w-14 shrink-0 overflow-hidden rounded-lg border bg-card flex items-center justify-center"
+          >
+            {b.logo_url ? (
+              <img src={b.logo_url} alt={name} className="h-full w-full object-cover" loading="lazy" />
+            ) : (
+              <Building2 className="h-6 w-6 text-muted-foreground" />
+            )}
+          </Link>
+          <div className="min-w-0 flex-1">
+            <Link to={`/seller-profile/${b.slug || b.id}`} className="font-semibold hover:text-primary line-clamp-1 block">
+              {name}
+            </Link>
+            <div className="mt-0.5 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+              {b.city && <span className="flex items-center gap-0.5"><MapPin className="h-3 w-3" />{b.city}</span>}
+              {b.verification_status === "verified" && (
+                <span className="flex items-center gap-0.5 text-trust"><Shield className="h-3 w-3" />Verified</span>
+              )}
+              {b.avg_rating ? (
+                <span className="flex items-center gap-0.5">
+                  <Star className="h-3 w-3 fill-warning text-warning" />{Number(b.avg_rating).toFixed(1)}
+                </span>
+              ) : null}
+            </div>
+            {b.business_category && (
+              <p className="mt-1 text-xs text-muted-foreground line-clamp-1">{b.business_category}</p>
+            )}
+          </div>
+        </div>
+        <div className="mt-3 grid grid-cols-2 gap-2">
+          <Button size="sm" variant="outline" asChild>
+            <Link to={`/seller-profile/${b.slug || b.id}`}>View Business</Link>
+          </Button>
+          {wa ? (
+            <Button size="sm" className="bg-[#25D366] text-white hover:bg-[#1eb959]" asChild>
+              <a href={`https://wa.me/${wa}`} target="_blank" rel="noopener noreferrer">
+                <MessageCircle className="mr-1 h-4 w-4" /> WhatsApp
+              </a>
+            </Button>
+          ) : (
+            <Button size="sm" asChild className="gradient-accent">
+              <Link to="/post-requirement">Get Quote</Link>
+            </Button>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  const serviceCard = (s: any, compact = false) => {
+    const img = Array.isArray(s.images) ? s.images[0] : null;
+    return (
+      <div
+        key={`s-${s.id}`}
+        className={`relative border-l-4 border-l-info bg-info/5 ${compact ? "p-3" : "rounded-xl border p-4"}`}
+      >
+        <Badge variant="secondary" className="mb-2">
+          <SlidersHorizontal className="mr-1 h-3 w-3" /> Service
+        </Badge>
+        <div className="flex gap-3">
+          <Link
+            to={`/service/${s.slug || s.id}`}
+            className="h-14 w-14 shrink-0 overflow-hidden rounded-lg border bg-card flex items-center justify-center"
+          >
+            {img ? (
+              <img src={img} alt={s.title} className="h-full w-full object-cover" loading="lazy" />
+            ) : (
+              <Package className="h-6 w-6 text-muted-foreground" />
+            )}
+          </Link>
+          <div className="min-w-0 flex-1">
+            <Link to={`/service/${s.slug || s.id}`} className="font-semibold hover:text-primary line-clamp-2 block">
+              {s.title}
+            </Link>
+            <div className="mt-0.5 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+              {(s.city || s.seller_profiles?.city) && (
+                <span className="flex items-center gap-0.5"><MapPin className="h-3 w-3" />{s.city || s.seller_profiles?.city}</span>
+              )}
+              {s.seller_profiles?.business_name && (
+                <span className="line-clamp-1">{s.seller_profiles.business_name}</span>
+              )}
+            </div>
+            {s.price != null && (
+              <div className="mt-1 flex items-center text-sm font-bold text-primary">
+                <IndianRupee className="h-3.5 w-3.5" />
+                {Number(s.price).toLocaleString("en-IN")}
+                {s.unit ? <span className="ml-1 text-xs font-normal text-muted-foreground">/ {s.unit}</span> : null}
+              </div>
+            )}
+          </div>
+        </div>
+        <div className="mt-3">
+          <Button size="sm" variant="outline" className="w-full" asChild>
+            <Link to={`/service/${s.slug || s.id}`}>View Service</Link>
+          </Button>
+        </div>
+      </div>
+    );
+  };
+
+
+
   const currentCategory = categories.find((c) => c.id === selectedCategory);
   const topLevelCategories = categories
     .filter((c) => c.level === 1)
