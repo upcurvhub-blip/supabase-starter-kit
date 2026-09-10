@@ -518,24 +518,6 @@ export default function Search() {
       <div className="container mx-auto px-4 py-8">
         <AdSlot placement="search_results" className="mb-4" />
 
-        {/* Mobile filter trigger */}
-        <div className="md:hidden mb-4">
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button variant="outline" size="sm" className="gap-2">
-                <SlidersHorizontal className="h-4 w-4" />
-                Filters
-                {hasActiveFilters && <span className="ml-1 h-2 w-2 rounded-full bg-primary" />}
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="left" className="w-[85vw] max-w-sm overflow-y-auto">
-              <SheetHeader>
-                <SheetTitle>Filters</SheetTitle>
-              </SheetHeader>
-              <div className="mt-4">{filtersCard}</div>
-            </SheetContent>
-          </Sheet>
-        </div>
         <div className="flex flex-col md:flex-row gap-6">
           {/* Filters Sidebar (desktop) */}
           <aside className="hidden md:block w-full md:w-72 shrink-0 space-y-4">
@@ -545,25 +527,48 @@ export default function Search() {
 
           {/* Results */}
           <div className="flex-1">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-              <div>
-                <h1 className="text-2xl font-bold">
+            {/* Compact toolbar: title row, then filters + sort share one row on mobile */}
+            <div className="mb-4 md:mb-6 space-y-2 md:space-y-0 md:flex md:items-center md:justify-between md:gap-4">
+              <div className="min-w-0">
+                <h1 className="text-xl md:text-2xl font-bold truncate">
                   {currentCategory ? currentCategory.name : query ? `Results for "${query}"` : "All Products"}
                 </h1>
-                <p className="text-muted-foreground text-sm">{visibleProducts.length} products found</p>
+                <p className="text-muted-foreground text-xs md:text-sm">
+                  {visibleProducts.length} products
+                  {businesses.length ? ` · ${businesses.length} businesses` : ""}
+                  {servicesFound.length ? ` · ${servicesFound.length} services` : ""}
+                </p>
               </div>
-              <Select value={sortBy} onValueChange={setSortBy}>
-                <SelectTrigger className="w-48">
-                  <SelectValue placeholder="Sort by" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="newest">Newest First</SelectItem>
-                  <SelectItem value="popular">Most Popular</SelectItem>
-                  <SelectItem value="price_low">Price: Low to High</SelectItem>
-                  <SelectItem value="price_high">Price: High to Low</SelectItem>
-                </SelectContent>
-              </Select>
+              <div className="flex items-center gap-2">
+                <Sheet>
+                  <SheetTrigger asChild>
+                    <Button variant="outline" size="sm" className="md:hidden gap-1.5 shrink-0 h-9">
+                      <SlidersHorizontal className="h-4 w-4" />
+                      Filters
+                      {hasActiveFilters && <span className="h-2 w-2 rounded-full bg-primary" />}
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent side="left" className="w-[85vw] max-w-sm overflow-y-auto">
+                    <SheetHeader>
+                      <SheetTitle>Filters</SheetTitle>
+                    </SheetHeader>
+                    <div className="mt-4">{filtersCard}</div>
+                  </SheetContent>
+                </Sheet>
+                <Select value={sortBy} onValueChange={setSortBy}>
+                  <SelectTrigger className="h-9 flex-1 md:w-48 md:flex-none">
+                    <SelectValue placeholder="Sort by" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="newest">Newest First</SelectItem>
+                    <SelectItem value="popular">Most Popular</SelectItem>
+                    <SelectItem value="price_low">Price: Low to High</SelectItem>
+                    <SelectItem value="price_high">Price: High to Low</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
+
 
             {loading ? (
               <div className="grid gap-4">
