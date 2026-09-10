@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useCityPreference, sortByCityPriority } from "@/hooks/useCityPreference";
 import { MarketplaceLayout } from "@/components/layouts/MarketplaceLayout";
 import { ProductBadgeStack } from "@/components/ProductBadgeStack";
+import { ProductCardPrice } from "@/components/product/ProductCardPrice";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Package, ChevronRight, IndianRupee, Building2, ArrowRight, ShieldCheck } from "lucide-react";
@@ -232,13 +233,8 @@ export default function CategoryPage() {
                         <span className="truncate">{product.seller_profiles.city}</span>
                       </div>
                     )}
-                    {product.price_min && (
-                      <div className="font-bold text-primary text-sm flex items-center">
-                        <IndianRupee className="h-3 w-3" />
-                        {product.price_min.toLocaleString()}
-                        {product.price_max ? ` - ${product.price_max.toLocaleString()}` : ""}
-                      </div>
-                    )}
+                    {/* Intent-aware: retail price for individual shoppers, wholesale range for businesses */}
+                    <ProductCardPrice product={product} showCta={false} size="sm" />
                     {product.seller_profiles && (
                       <div className="text-[11px] text-muted-foreground flex items-center gap-1 pt-1 border-t">
                         {product.seller_profiles.verification_status === "verified" ? (

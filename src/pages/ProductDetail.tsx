@@ -1269,8 +1269,8 @@ export default function ProductDetail() {
 
       {/* Mobile sticky Enquire Now bar with swipe-up expand */}
       <div
-        className="fixed bottom-0 inset-x-0 z-40 md:hidden bg-background border-t shadow-2xl transition-all duration-300"
-        style={{ transform: bottomBarExpanded ? "translateY(0)" : "translateY(0)" }}
+        className="fixed bottom-0 inset-x-0 z-50 md:hidden bg-background/95 backdrop-blur-md border-t rounded-t-2xl shadow-2xl transition-all duration-300"
+        style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
         onTouchStart={(e) => { touchStartY.current = e.touches[0].clientY; }}
         onTouchEnd={(e) => {
           if (touchStartY.current == null) return;

@@ -40,6 +40,34 @@ export default function Search() {
   const [selectedLocations, setSelectedLocations] = useState<string[]>([]);
   const [locations, setLocations] = useState<string[]>([]);
   const [expandedCategories, setExpandedCategories] = useState<string[]>([]);
+  const [businesses, setBusinesses] = useState<any[]>([]);
+  const [servicesFound, setServicesFound] = useState<any[]>([]);
+
+  // Matching businesses + services, blended into the product results below.
+  useEffect(() => {
+    const term = query.trim();
+    if (!term) { setBusinesses([]); setServicesFound([]); return; }
+    let cancelled = false;
+    (async () => {
+      const [b, s] = await Promise.all([
+        supabase
+          .from("seller_profiles")
+          .select("id, business_name, company_name, slug, city, state, logo_url, verification_status, avg_rating, total_reviews, business_category, business_type, phone, whatsapp")
+          .or(`business_name.ilike.%${term}%,company_name.ilike.%${term}%,business_category.ilike.%${term}%`)
+          .limit(6),
+        supabase
+          .from("services")
+          .select("id, title, slug, description, price, unit, city, images, seller_id, seller_profiles(business_name, slug, city)")
+          .eq("is_active", true)
+          .or(`title.ilike.%${term}%,description.ilike.%${term}%`)
+          .limit(6),
+      ]);
+      if (cancelled) return;
+      setBusinesses(b.data || []);
+      setServicesFound(s.data || []);
+    })();
+    return () => { cancelled = true; };
+  }, [query]);
 
   // Track search query
   useEffect(() => {
@@ -188,6 +216,142 @@ export default function Search() {
     () => sortByCityPriority(products, prefCity, (p: any) => p.seller_profiles?.city),
     [products, prefCity],
   );
+
+  /**
+   * Blended result feed: matching businesses and services are dropped in
+   * between products (one every 4 products) so buyers discover suppliers
+   * without leaving the results list. Each carries its own visual style.
+   */
+  type FeedItem = { type: "product" | "business" | "service"; data: any };
+  const feed = useMemo<FeedItem[]>(() => {
+    const extras: FeedItem[] = [
+      ...businesses.map((b) => ({ type: "business" as const, data: b })),
+      ...servicesFound.map((s) => ({ type: "service" as const, data: s })),
+    ];
+    const out: FeedItem[] = [];
+    let e = 0;
+    visibleProducts.forEach((p: any, i: number) => {
+      out.push({ type: "product", data: p });
+      if ((i + 1) % 4 === 0 && e < extras.length) out.push(extras[e++]);
+    });
+    while (e < extras.length) out.push(extras[e++]);
+    return out;
+  }, [visibleProducts, businesses, servicesFound]);
+
+  const businessCard = (b: any, compact = false) => {
+    const name = b.business_name || b.company_name || "Business";
+    const wa = String(b.whatsapp || b.phone || "").replace(/\D/g, "");
+    return (
+      <div
+        key={`b-${b.id}`}
+        className={`relative border-l-4 border-l-accent bg-accent/5 ${compact ? "p-3" : "rounded-xl border p-4"}`}
+      >
+        <Badge className="mb-2 bg-accent text-accent-foreground">
+          <Building2 className="mr-1 h-3 w-3" /> Business
+        </Badge>
+        <div className="flex gap-3">
+          <Link
+            to={`/seller-profile/${b.slug || b.id}`}
+            className="h-14 w-14 shrink-0 overflow-hidden rounded-lg border bg-card flex items-center justify-center"
+          >
+            {b.logo_url ? (
+              <img src={b.logo_url} alt={name} className="h-full w-full object-cover" loading="lazy" />
+            ) : (
+              <Building2 className="h-6 w-6 text-muted-foreground" />
+            )}
+          </Link>
+          <div className="min-w-0 flex-1">
+            <Link to={`/seller-profile/${b.slug || b.id}`} className="font-semibold hover:text-primary line-clamp-1 block">
+              {name}
+            </Link>
+            <div className="mt-0.5 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+              {b.city && <span className="flex items-center gap-0.5"><MapPin className="h-3 w-3" />{b.city}</span>}
+              {b.verification_status === "verified" && (
+                <span className="flex items-center gap-0.5 text-trust"><Shield className="h-3 w-3" />Verified</span>
+              )}
+              {b.avg_rating ? (
+                <span className="flex items-center gap-0.5">
+                  <Star className="h-3 w-3 fill-warning text-warning" />{Number(b.avg_rating).toFixed(1)}
+                </span>
+              ) : null}
+            </div>
+            {b.business_category && (
+              <p className="mt-1 text-xs text-muted-foreground line-clamp-1">{b.business_category}</p>
+            )}
+          </div>
+        </div>
+        <div className="mt-3 grid grid-cols-2 gap-2">
+          <Button size="sm" variant="outline" asChild>
+            <Link to={`/seller-profile/${b.slug || b.id}`}>View Business</Link>
+          </Button>
+          {wa ? (
+            <Button size="sm" className="bg-[#25D366] text-white hover:bg-[#1eb959]" asChild>
+              <a href={`https://wa.me/${wa}`} target="_blank" rel="noopener noreferrer">
+                <MessageCircle className="mr-1 h-4 w-4" /> WhatsApp
+              </a>
+            </Button>
+          ) : (
+            <Button size="sm" asChild className="gradient-accent">
+              <Link to="/post-requirement">Get Quote</Link>
+            </Button>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  const serviceCard = (s: any, compact = false) => {
+    const img = Array.isArray(s.images) ? s.images[0] : null;
+    return (
+      <div
+        key={`s-${s.id}`}
+        className={`relative border-l-4 border-l-info bg-info/5 ${compact ? "p-3" : "rounded-xl border p-4"}`}
+      >
+        <Badge variant="secondary" className="mb-2">
+          <SlidersHorizontal className="mr-1 h-3 w-3" /> Service
+        </Badge>
+        <div className="flex gap-3">
+          <Link
+            to={`/service/${s.slug || s.id}`}
+            className="h-14 w-14 shrink-0 overflow-hidden rounded-lg border bg-card flex items-center justify-center"
+          >
+            {img ? (
+              <img src={img} alt={s.title} className="h-full w-full object-cover" loading="lazy" />
+            ) : (
+              <Package className="h-6 w-6 text-muted-foreground" />
+            )}
+          </Link>
+          <div className="min-w-0 flex-1">
+            <Link to={`/service/${s.slug || s.id}`} className="font-semibold hover:text-primary line-clamp-2 block">
+              {s.title}
+            </Link>
+            <div className="mt-0.5 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+              {(s.city || s.seller_profiles?.city) && (
+                <span className="flex items-center gap-0.5"><MapPin className="h-3 w-3" />{s.city || s.seller_profiles?.city}</span>
+              )}
+              {s.seller_profiles?.business_name && (
+                <span className="line-clamp-1">{s.seller_profiles.business_name}</span>
+              )}
+            </div>
+            {s.price != null && (
+              <div className="mt-1 flex items-center text-sm font-bold text-primary">
+                <IndianRupee className="h-3.5 w-3.5" />
+                {Number(s.price).toLocaleString("en-IN")}
+                {s.unit ? <span className="ml-1 text-xs font-normal text-muted-foreground">/ {s.unit}</span> : null}
+              </div>
+            )}
+          </div>
+        </div>
+        <div className="mt-3">
+          <Button size="sm" variant="outline" className="w-full" asChild>
+            <Link to={`/service/${s.slug || s.id}`}>View Service</Link>
+          </Button>
+        </div>
+      </div>
+    );
+  };
+
+
 
   const currentCategory = categories.find((c) => c.id === selectedCategory);
   const topLevelCategories = categories
@@ -354,24 +518,6 @@ export default function Search() {
       <div className="container mx-auto px-4 py-8">
         <AdSlot placement="search_results" className="mb-4" />
 
-        {/* Mobile filter trigger */}
-        <div className="md:hidden mb-4">
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button variant="outline" size="sm" className="gap-2">
-                <SlidersHorizontal className="h-4 w-4" />
-                Filters
-                {hasActiveFilters && <span className="ml-1 h-2 w-2 rounded-full bg-primary" />}
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="left" className="w-[85vw] max-w-sm overflow-y-auto">
-              <SheetHeader>
-                <SheetTitle>Filters</SheetTitle>
-              </SheetHeader>
-              <div className="mt-4">{filtersCard}</div>
-            </SheetContent>
-          </Sheet>
-        </div>
         <div className="flex flex-col md:flex-row gap-6">
           {/* Filters Sidebar (desktop) */}
           <aside className="hidden md:block w-full md:w-72 shrink-0 space-y-4">
@@ -381,25 +527,48 @@ export default function Search() {
 
           {/* Results */}
           <div className="flex-1">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-              <div>
-                <h1 className="text-2xl font-bold">
+            {/* Compact toolbar: title row, then filters + sort share one row on mobile */}
+            <div className="mb-4 md:mb-6 space-y-2 md:space-y-0 md:flex md:items-center md:justify-between md:gap-4">
+              <div className="min-w-0">
+                <h1 className="text-xl md:text-2xl font-bold truncate">
                   {currentCategory ? currentCategory.name : query ? `Results for "${query}"` : "All Products"}
                 </h1>
-                <p className="text-muted-foreground text-sm">{visibleProducts.length} products found</p>
+                <p className="text-muted-foreground text-xs md:text-sm">
+                  {visibleProducts.length} products
+                  {businesses.length ? ` · ${businesses.length} businesses` : ""}
+                  {servicesFound.length ? ` · ${servicesFound.length} services` : ""}
+                </p>
               </div>
-              <Select value={sortBy} onValueChange={setSortBy}>
-                <SelectTrigger className="w-48">
-                  <SelectValue placeholder="Sort by" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="newest">Newest First</SelectItem>
-                  <SelectItem value="popular">Most Popular</SelectItem>
-                  <SelectItem value="price_low">Price: Low to High</SelectItem>
-                  <SelectItem value="price_high">Price: High to Low</SelectItem>
-                </SelectContent>
-              </Select>
+              <div className="flex items-center gap-2">
+                <Sheet>
+                  <SheetTrigger asChild>
+                    <Button variant="outline" size="sm" className="md:hidden gap-1.5 shrink-0 h-9">
+                      <SlidersHorizontal className="h-4 w-4" />
+                      Filters
+                      {hasActiveFilters && <span className="h-2 w-2 rounded-full bg-primary" />}
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent side="left" className="w-[85vw] max-w-sm overflow-y-auto">
+                    <SheetHeader>
+                      <SheetTitle>Filters</SheetTitle>
+                    </SheetHeader>
+                    <div className="mt-4">{filtersCard}</div>
+                  </SheetContent>
+                </Sheet>
+                <Select value={sortBy} onValueChange={setSortBy}>
+                  <SelectTrigger className="h-9 flex-1 md:w-48 md:flex-none">
+                    <SelectValue placeholder="Sort by" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="newest">Newest First</SelectItem>
+                    <SelectItem value="popular">Most Popular</SelectItem>
+                    <SelectItem value="price_low">Price: Low to High</SelectItem>
+                    <SelectItem value="price_high">Price: High to Low</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
+
 
             {loading ? (
               <div className="grid gap-4">
