@@ -609,7 +609,9 @@ export default function SellerProfile() {
 
         {/* Content Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="w-full justify-start border-b bg-transparent h-auto p-0 mb-6">
+          {/* Mobile: wraps onto two rows instead of running off-screen */}
+          <TabsList className="w-full grid grid-cols-3 gap-1 md:flex md:justify-start border-b bg-transparent h-auto p-0 mb-6">
+
             <TabsTrigger 
               value="products" 
               className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-6 py-3"

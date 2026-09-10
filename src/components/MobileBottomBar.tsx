@@ -17,10 +17,14 @@ const ITEMS = [
 export function MobileBottomBar() {
   const { pathname } = useLocation();
 
+  // Detail pages own the bottom of the screen with their own sticky
+  // Call / Enquire bar, so the global nav steps aside there.
   const hidden =
     pathname.startsWith("/seller/") ||
     pathname.startsWith("/admin") ||
-    pathname.startsWith("/auth");
+    pathname.startsWith("/auth") ||
+    pathname.startsWith("/product/") ||
+    pathname.startsWith("/service/");
   if (hidden) return null;
 
   return (
