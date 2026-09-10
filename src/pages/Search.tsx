@@ -40,6 +40,34 @@ export default function Search() {
   const [selectedLocations, setSelectedLocations] = useState<string[]>([]);
   const [locations, setLocations] = useState<string[]>([]);
   const [expandedCategories, setExpandedCategories] = useState<string[]>([]);
+  const [businesses, setBusinesses] = useState<any[]>([]);
+  const [servicesFound, setServicesFound] = useState<any[]>([]);
+
+  // Matching businesses + services, blended into the product results below.
+  useEffect(() => {
+    const term = query.trim();
+    if (!term) { setBusinesses([]); setServicesFound([]); return; }
+    let cancelled = false;
+    (async () => {
+      const [b, s] = await Promise.all([
+        supabase
+          .from("seller_profiles")
+          .select("id, business_name, company_name, slug, city, state, logo_url, verification_status, avg_rating, total_reviews, business_category, business_type, phone, whatsapp")
+          .or(`business_name.ilike.%${term}%,company_name.ilike.%${term}%,business_category.ilike.%${term}%`)
+          .limit(6),
+        supabase
+          .from("services")
+          .select("id, title, slug, description, price, unit, city, images, seller_id, seller_profiles(business_name, slug, city)")
+          .eq("is_active", true)
+          .or(`title.ilike.%${term}%,description.ilike.%${term}%`)
+          .limit(6),
+      ]);
+      if (cancelled) return;
+      setBusinesses(b.data || []);
+      setServicesFound(s.data || []);
+    })();
+    return () => { cancelled = true; };
+  }, [query]);
 
   // Track search query
   useEffect(() => {
