@@ -614,31 +614,31 @@ export default function SellerProfile() {
 
             <TabsTrigger 
               value="products" 
-              className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-6 py-3"
+              className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-2 md:px-6 py-3 text-xs md:text-sm whitespace-nowrap"
             >
               Products ({products?.length || 0})
             </TabsTrigger>
             <TabsTrigger
               value="services"
-              className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-6 py-3"
+              className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-2 md:px-6 py-3 text-xs md:text-sm whitespace-nowrap"
             >
               Services ({services?.length || 0})
             </TabsTrigger>
             <TabsTrigger 
               value="about" 
-              className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-6 py-3"
+              className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-2 md:px-6 py-3 text-xs md:text-sm whitespace-nowrap"
             >
               About
             </TabsTrigger>
             <TabsTrigger 
               value="gallery" 
-              className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-6 py-3"
+              className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-2 md:px-6 py-3 text-xs md:text-sm whitespace-nowrap"
             >
               Gallery ({((seller as any)?.gallery as GalleryItem[] | undefined)?.length || 0})
             </TabsTrigger>
             <TabsTrigger 
               value="reviews" 
-              className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-6 py-3"
+              className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-2 md:px-6 py-3 text-xs md:text-sm whitespace-nowrap"
             >
               Reviews ({reviews?.length || 0})
             </TabsTrigger>
