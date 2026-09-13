@@ -242,6 +242,23 @@ const SellerAnalytics = () => {
     color: ctaPalette[i % ctaPalette.length],
   }));
   const ctaLast30 = (ctaEvents as any[]).filter((e: any) => new Date(e.created_at) >= _daysAgo(30)).length;
+
+  // Profile-level button clicks (WhatsApp / Call / Share / Save / Claim) recorded
+  // as visitor page views of type `seller_cta`.
+  const PROFILE_CTA_KINDS = [
+    { key: "whatsapp", label: "Profile WhatsApp", color: "success" },
+    { key: "call", label: "Profile Calls", color: "primary" },
+    { key: "share", label: "Profile Shares", color: "warning" },
+    { key: "like", label: "Profile Saves", color: "accent" },
+    { key: "claim", label: "Claim Requests", color: "info" },
+  ];
+  const profileCtaEvents = (pageViews as any[]).filter((v: any) => v.page_type === "seller_cta");
+  const profileCtaCounts = profileCtaEvents.reduce((acc: Record<string, number>, v: any) => {
+    const k = v?.metadata?.cta;
+    if (k) acc[k] = (acc[k] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+  const profileCtaLast30 = profileCtaEvents.filter((v: any) => new Date(v.created_at) >= _daysAgo(30)).length;
   const ctaByProductRows = (products || []).map((p: any) => {
     const evs = (ctaEvents as any[]).filter((e: any) => e.product_id === p.id);
     const count = (k: string) => evs.filter((e: any) => e.cta === k).length;
