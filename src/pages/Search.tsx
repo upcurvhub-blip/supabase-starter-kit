@@ -587,7 +587,7 @@ export default function Search() {
                   </Card>
                 ))}
               </div>
-            ) : visibleProducts.length === 0 ? (
+            ) : feed.length === 0 ? (
               <Card>
                 <CardContent className="p-12 text-center">
                   <Package className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
@@ -604,8 +604,12 @@ export default function Search() {
               <>
               {/* Mobile: IndiaMart-style list layout */}
               <div className="md:hidden divide-y rounded-lg border bg-card">
-                {visibleProducts.map((product) => {
+                {feed.map((item) => {
+                  if (item.type === "business") return businessCard(item.data, true);
+                  if (item.type === "service") return serviceCard(item.data, true);
+                  const product = item.data;
                   const seller = product.seller_profiles;
+
                   const specs = (product.specifications && typeof product.specifications === "object")
                     ? Object.entries(product.specifications as Record<string, any>).filter(([, v]) => v).slice(0, 4)
                     : [];
@@ -705,8 +709,13 @@ export default function Search() {
 
               {/* Desktop grid */}
               <div className="hidden md:grid grid-cols-2 xl:grid-cols-3 gap-4">
-                {visibleProducts.map((product) => (
+                {feed.map((item) => {
+                  if (item.type === "business") return businessCard(item.data);
+                  if (item.type === "service") return serviceCard(item.data);
+                  const product = item.data;
+                  return (
                   <Card key={product.id} className="hover:shadow-lg transition-all overflow-hidden border-2 hover:border-primary/20">
+
                     <CardContent className="p-0">
                       <Link to={`/product/${product.slug || product.id}`}>
                         <div className="aspect-[4/3] bg-muted flex items-center justify-center overflow-hidden">
@@ -767,8 +776,10 @@ export default function Search() {
                       </div>
                     </CardContent>
                   </Card>
-                ))}
+                  );
+                })}
               </div>
+
               </>
             )}
           </div>
