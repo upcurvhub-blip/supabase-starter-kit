@@ -71,20 +71,28 @@ export function SearchSuggest({
   const suggestions = useMemo(() => buildSuggestions(q), [q]);
   const [cats, setCats] = useState<any[]>([]);
   const [prods, setProds] = useState<any[]>([]);
+  const [svcs, setSvcs] = useState<any[]>([]);
+  const [bizs, setBizs] = useState<any[]>([]);
 
-  // Live category + product matches from the database (debounced).
+  // Live category + product + service + business matches (debounced).
   useEffect(() => {
     const term = q.trim();
-    if (term.length < 2) { setCats([]); setProds([]); return; }
+    if (term.length < 2) { setCats([]); setProds([]); setSvcs([]); setBizs([]); return; }
     const t = setTimeout(async () => {
-      const [c, p] = await Promise.all([
+      const [c, p, s, b] = await Promise.all([
         supabase.from("categories").select("id,name,slug").eq("is_active", true)
           .ilike("name", `%${term}%`).limit(4),
         supabase.from("products").select("id,name,slug,price_min,primary_image_url").eq("is_active", true)
           .ilike("name", `%${term}%`).order("rank_score", { ascending: false }).limit(5),
+        supabase.from("services").select("id,title,slug,price,city").eq("is_active", true)
+          .ilike("title", `%${term}%`).limit(4),
+        supabase.from("seller_profiles").select("id,business_name,company_name,slug,city,logo_url")
+          .or(`business_name.ilike.%${term}%,company_name.ilike.%${term}%`).limit(3),
       ]);
       setCats(c.data || []);
       setProds(p.data || []);
+      setSvcs(s.data || []);
+      setBizs(b.data || []);
     }, 220);
     return () => clearTimeout(t);
   }, [q]);
