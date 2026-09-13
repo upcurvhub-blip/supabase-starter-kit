@@ -242,6 +242,23 @@ const SellerAnalytics = () => {
     color: ctaPalette[i % ctaPalette.length],
   }));
   const ctaLast30 = (ctaEvents as any[]).filter((e: any) => new Date(e.created_at) >= _daysAgo(30)).length;
+
+  // Profile-level button clicks (WhatsApp / Call / Share / Save / Claim) recorded
+  // as visitor page views of type `seller_cta`.
+  const PROFILE_CTA_KINDS = [
+    { key: "whatsapp", label: "Profile WhatsApp", color: "success" },
+    { key: "call", label: "Profile Calls", color: "primary" },
+    { key: "share", label: "Profile Shares", color: "warning" },
+    { key: "like", label: "Profile Saves", color: "accent" },
+    { key: "claim", label: "Claim Requests", color: "info" },
+  ];
+  const profileCtaEvents = (pageViews as any[]).filter((v: any) => v.page_type === "seller_cta");
+  const profileCtaCounts = profileCtaEvents.reduce((acc: Record<string, number>, v: any) => {
+    const k = v?.metadata?.cta;
+    if (k) acc[k] = (acc[k] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+  const profileCtaLast30 = profileCtaEvents.filter((v: any) => new Date(v.created_at) >= _daysAgo(30)).length;
   const ctaByProductRows = (products || []).map((p: any) => {
     const evs = (ctaEvents as any[]).filter((e: any) => e.product_id === p.id);
     const count = (k: string) => evs.filter((e: any) => e.cta === k).length;
@@ -490,7 +507,35 @@ const SellerAnalytics = () => {
               rows={ctaByProductRows}
               emptyMessage="No CTA clicks tracked for your products yet."
             />
+
+            {/* Profile page buttons */}
+            <div>
+              <h3 className="mb-3 text-base font-semibold">Business profile buttons</h3>
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                {PROFILE_CTA_KINDS.map((k) => (
+                  <MetricCard
+                    key={`profile-${k.key}`}
+                    title={k.label}
+                    value={String(profileCtaCounts[k.key] || 0)}
+                    changeLabel="all time"
+                    icon={<Activity className="h-6 w-6" />}
+                    color={k.color as any}
+                  />
+                ))}
+              </div>
+              <Card className="mt-4">
+                <CardHeader><CardTitle className="text-base">Profile button activity</CardTitle></CardHeader>
+                <CardContent className="space-y-3">
+                  {profileCtaEvents.length ? (
+                    <ProgressBar label="Clicks in last 30 days" value={profileCtaLast30} max={Math.max(profileCtaEvents.length, 1)} color="primary" />
+                  ) : (
+                    <p className="text-sm text-muted-foreground">No profile button clicks yet. They appear when visitors use WhatsApp, Call, Share or Save on your business page.</p>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
+
 
           <TabsContent value="overview" className="space-y-6 mt-6">
             {/* Key Metrics */}

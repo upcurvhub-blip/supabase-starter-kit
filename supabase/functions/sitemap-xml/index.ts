@@ -18,7 +18,8 @@ const SERVICE_ROLE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
 const HEADERS = {
   "Content-Type": "application/xml; charset=utf-8",
-  "Cache-Control": "public, max-age=3600",
+  // Short cache so newly created business listings show up in the sitemap quickly.
+  "Cache-Control": "public, max-age=600",
   "Access-Control-Allow-Origin": "*",
 };
 
