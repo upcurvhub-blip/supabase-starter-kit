@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Search, Sparkles, TrendingUp, Tag, Package, IndianRupee } from "lucide-react";
+import { Search, Sparkles, TrendingUp, Tag, Package, IndianRupee, Wrench, Building2 } from "lucide-react";
 import { SYNONYMS, parseQuery } from "@/lib/searchIntelligence";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -182,6 +182,40 @@ export function SearchSuggest({
                       <IndianRupee className="h-3 w-3" />{Number(p.price_min).toLocaleString()}
                     </span>
                   )}
+                </Link>
+              ))}
+            </div>
+          )}
+          {!showTrending && svcs.length > 0 && (
+            <div className="border-b">
+              <div className="px-3 pt-2 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Services</div>
+              {svcs.map((s) => (
+                <Link key={s.id} to={`/service/${s.slug || s.id}`} onMouseDown={() => setOpen(false)}
+                  className="w-full text-left px-3 py-2 text-sm flex items-center gap-2 hover:bg-muted">
+                  <span className="h-7 w-7 rounded bg-info/10 flex items-center justify-center shrink-0">
+                    <Wrench className="h-3.5 w-3.5 text-info" />
+                  </span>
+                  <span className="truncate flex-1">{s.title}</span>
+                  {s.city && <span className="text-xs text-muted-foreground shrink-0">{s.city}</span>}
+                </Link>
+              ))}
+            </div>
+          )}
+          {!showTrending && bizs.length > 0 && (
+            <div className="border-b">
+              <div className="px-3 pt-2 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Businesses</div>
+              {bizs.map((b) => (
+                <Link key={b.id} to={`/seller-profile/${b.slug || b.id}`} onMouseDown={() => setOpen(false)}
+                  className="w-full text-left px-3 py-2 text-sm flex items-center gap-2 hover:bg-muted">
+                  {b.logo_url ? (
+                    <img src={b.logo_url} alt="" className="h-7 w-7 rounded object-cover shrink-0" />
+                  ) : (
+                    <span className="h-7 w-7 rounded bg-accent/10 flex items-center justify-center shrink-0">
+                      <Building2 className="h-3.5 w-3.5 text-accent" />
+                    </span>
+                  )}
+                  <span className="truncate flex-1">{b.business_name || b.company_name}</span>
+                  {b.city && <span className="text-xs text-muted-foreground shrink-0">{b.city}</span>}
                 </Link>
               ))}
             </div>
