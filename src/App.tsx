@@ -57,6 +57,7 @@ const SellerGuide = lazyRoute(() => import("./pages/seller/Guide"));
 const AdminDashboard = lazyRoute(() => import("./pages/admin/Dashboard"));
 const SellerDetail = lazyRoute(() => import("./pages/admin/SellerDetail"));
 const BusinessProfiles = lazyRoute(() => import("./pages/admin/BusinessProfiles"));
+const AiBusinessFinder = lazyRoute(() => import("./pages/admin/AiBusinessFinder"));
 
 const ManageSellers = lazyRoute(() => import("./pages/admin/ManageSellers"));
 const ManageCategories = lazyRoute(() => import("./pages/admin/ManageCategories"));
@@ -184,6 +185,7 @@ const App = () => (
           <Route path="/admin" element={<RequireRole role="admin"><AdminDashboard /></RequireRole>} />
           <Route path="/admin/sellers" element={<RequireRole role="admin"><ManageSellers /></RequireRole>} />
           <Route path="/admin/business-profiles" element={<RequireRole role="admin"><BusinessProfiles /></RequireRole>} />
+          <Route path="/admin/ai-business-finder" element={<RequireRole role="admin"><AiBusinessFinder /></RequireRole>} />
 
           <Route path="/admin/sellers/:id" element={<RequireRole role="admin"><SellerDetail /></RequireRole>} />
           <Route path="/admin/categories" element={<RequireRole role="admin"><ManageCategories /></RequireRole>} />
