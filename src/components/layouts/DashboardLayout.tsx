@@ -49,6 +49,7 @@ const adminLinks: SidebarLink[] = [
   { label: "Analytics", href: "/admin/analytics", icon: BarChart3 },
   { label: "Manage Sellers", href: "/admin/sellers", icon: Briefcase },
   { label: "Business Listings", href: "/admin/business-profiles", icon: Building2 },
+  { label: "AI Business Finder", href: "/admin/ai-business-finder", icon: Sparkles },
   { label: "Categories", href: "/admin/categories", icon: Tag },
   { label: "Local Landing Pages", href: "/admin/local-pages", icon: MapPin },
   { label: "Ads Manager", href: "/admin/ads", icon: Sparkles },
